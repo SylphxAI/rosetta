@@ -5,7 +5,7 @@
  * ```ts
  * // 1. Create schema in your Drizzle schema file
  * import { pgTable, text, timestamp, integer, boolean, unique, serial } from 'drizzle-orm/pg-core';
- * import { createRosettaSchema } from '@sylphx/rosetta-drizzle/schema';
+ * import { createRosettaSchema } from '@sylphx/rosetta-drizzle';
  *
  * export const { rosettaSources, rosettaTranslations } = createRosettaSchema({
  *   pgTable, text, timestamp, integer, boolean, unique, serial
@@ -33,3 +33,14 @@ export {
 	type DrizzleStorageAdapterConfig,
 	type DrizzleDatabase,
 } from './adapter';
+
+// Re-export schema helpers from main entry (avoids drizzle-kit ESM subpath issues)
+export {
+	createRosettaSchema,
+	createRosettaSchemaSQLite,
+	createRosettaSchemaMySQL,
+	type PostgresSchemaHelpers,
+	type SQLiteSchemaHelpers,
+	type MySQLSchemaHelpers,
+	type RosettaSchemaOptions,
+} from './schema';

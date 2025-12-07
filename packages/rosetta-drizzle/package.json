@@ -7,19 +7,21 @@
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js"
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs"
 		},
 		"./schema": {
 			"types": "./dist/schema.d.ts",
-			"import": "./dist/schema.js"
+			"import": "./dist/schema.js",
+			"require": "./dist/schema.cjs"
 		}
 	},
 	"files": [
 		"dist"
 	],
 	"scripts": {
-		"build": "bunup src/index.ts src/schema.ts --dts --external drizzle-orm --external @sylphx/rosetta",
-		"dev": "bunup src/index.ts src/schema.ts --dts --external drizzle-orm --external @sylphx/rosetta --watch",
+		"build": "bunup src/index.ts src/schema.ts --dts --format esm,cjs --external drizzle-orm --external @sylphx/rosetta",
+		"dev": "bunup src/index.ts src/schema.ts --dts --format esm,cjs --external drizzle-orm --external @sylphx/rosetta --watch",
 		"test": "bun test",
 		"typecheck": "tsc --noEmit",
 		"clean": "rm -rf dist"
