@@ -1,14 +1,14 @@
 /**
- * @sylphx/rosetta-react - React bindings for Rosetta i18n
+ * @sylphx/rosetta-next - Next.js integration for Rosetta i18n
  *
- * Client-side hooks and provider for React applications.
+ * Client-side hooks for Next.js client components.
  *
  * @example
- * // For server-side setup, use @sylphx/rosetta-react/server
- * import { RosettaProvider } from '@sylphx/rosetta-react/server';
+ * // For layout setup, use @sylphx/rosetta-next/server
+ * import { RosettaProvider } from '@sylphx/rosetta-next/server';
  *
  * // For client components
- * import { useT, useLocale } from '@sylphx/rosetta-react';
+ * import { useT, useLocale } from '@sylphx/rosetta-next';
  *
  * function MyClientComponent() {
  *   const t = useT();

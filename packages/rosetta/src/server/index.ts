@@ -16,7 +16,7 @@
  * // ============================================
  * // Layout (app/[locale]/layout.tsx)
  * // ============================================
- * import { RosettaProvider } from '@sylphx/rosetta-react/server';
+ * import { RosettaProvider } from '@sylphx/rosetta-next/server';
  * import { rosetta } from '@/lib/i18n';
  *
  * export default async function Layout({ children, params }) {
@@ -42,7 +42,7 @@
  * // Client Component
  * // ============================================
  * 'use client';
- * import { useT } from '@sylphx/rosetta-react';
+ * import { useT } from '@sylphx/rosetta-next';
  *
  * export function AddToCartButton() {
  *   const t = useT();

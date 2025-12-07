@@ -1,7 +1,7 @@
 {
-	"name": "@sylphx/rosetta-react",
+	"name": "@sylphx/rosetta-next",
 	"version": "0.1.0",
-	"description": "React bindings for @sylphx/rosetta",
+	"description": "Next.js integration for @sylphx/rosetta i18n",
 	"license": "MIT",
 	"type": "module",
 	"exports": {
@@ -23,6 +23,7 @@
 	},
 	"peerDependencies": {
 		"@sylphx/rosetta": ">=0.1.0",
+		"next": ">=14.0.0",
 		"react": "^18.0.0 || ^19.0.0"
 	},
 	"devDependencies": {
@@ -37,11 +38,11 @@
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/SylphxAI/rosetta.git",
-		"directory": "packages/rosetta-react"
+		"directory": "packages/rosetta-next"
 	},
 	"homepage": "https://github.com/SylphxAI/rosetta#readme",
 	"bugs": {
 		"url": "https://github.com/SylphxAI/rosetta/issues"
 	},
-	"keywords": ["i18n", "react", "translation", "rosetta", "hooks", "provider"]
+	"keywords": ["i18n", "nextjs", "next", "translation", "rosetta", "app-router", "server-components"]
 }

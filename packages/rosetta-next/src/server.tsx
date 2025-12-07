@@ -43,7 +43,7 @@ export interface RosettaProviderProps {
  * @example
  * // Basic usage - loads all translations
  * // app/[locale]/layout.tsx
- * import { RosettaProvider } from '@sylphx/rosetta-react/server';
+ * import { RosettaProvider } from '@sylphx/rosetta-next/server';
  * import { rosetta } from '@/lib/i18n';
  *
  * export default async function Layout({ children, params }) {
@@ -83,7 +83,7 @@ export interface RosettaProviderProps {
  * @example
  * // In client components - use useT hook
  * 'use client';
- * import { useT } from '@sylphx/rosetta-react';
+ * import { useT } from '@sylphx/rosetta-next';
  * function MyButton() {
  *   const t = useT();
  *   return <button>{t("Click me")}</button>;
