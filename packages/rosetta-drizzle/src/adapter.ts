@@ -70,24 +70,23 @@ export interface DrizzleDatabase {
 
 /**
  * Configuration for DrizzleStorageAdapter
+ *
+ * Note: Uses permissive types to support all Drizzle dialects and table configurations.
+ * Runtime validation ensures correct table structure.
  */
-export interface DrizzleStorageAdapterConfig<
-	TDB extends DrizzleDatabase,
-	TSources extends Record<string, unknown>,
-	TTranslations extends Record<string, unknown>,
-> {
+export interface DrizzleStorageAdapterConfig {
 	/**
-	 * Drizzle database instance
+	 * Drizzle database instance (any dialect)
 	 */
-	db: TDB;
+	db: DrizzleDatabase;
 	/**
 	 * Rosetta sources table created by createRosettaSchema
 	 */
-	sources: TSources;
+	sources: object;
 	/**
 	 * Rosetta translations table created by createRosettaSchema
 	 */
-	translations: TTranslations;
+	translations: object;
 }
 
 // ============================================
@@ -100,17 +99,12 @@ export interface DrizzleStorageAdapterConfig<
  * Implements the full StorageAdapter interface including admin methods.
  * Works with PostgreSQL, MySQL, and SQLite via Drizzle ORM.
  */
-export class DrizzleStorageAdapter<
-	TDB extends DrizzleDatabase,
-	TSources extends Record<string, unknown>,
-	TTranslations extends Record<string, unknown>,
-> implements StorageAdapter
-{
-	private db: TDB;
-	private sources: TSources;
-	private translations: TTranslations;
+export class DrizzleStorageAdapter implements StorageAdapter {
+	private db: DrizzleDatabase;
+	private sources: object;
+	private translations: object;
 
-	constructor(config: DrizzleStorageAdapterConfig<TDB, TSources, TTranslations>) {
+	constructor(config: DrizzleStorageAdapterConfig) {
 		this.db = config.db;
 		this.sources = config.sources;
 		this.translations = config.translations;
