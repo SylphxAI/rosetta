@@ -165,7 +165,7 @@ export function getDefaultLocale(): string {
 }
 
 /**
- * Get translations map from context
+ * Get translations map from context (hash -> translated text)
  */
 export function getTranslations(): Map<string, string> {
 	return rosettaStorage.getStore()?.translations ?? new Map();
@@ -173,8 +173,9 @@ export function getTranslations(): Map<string, string> {
 
 /**
  * Get translations for client components
- * Returns source text -> translated text map
+ * Returns hash -> translated text map (same as server)
  */
 export function getTranslationsForClient(): Record<string, string> {
-	return rosettaStorage.getStore()?.translationsForClient ?? {};
+	const translations = rosettaStorage.getStore()?.translations;
+	return translations ? Object.fromEntries(translations) : {};
 }

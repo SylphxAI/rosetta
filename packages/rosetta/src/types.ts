@@ -107,13 +107,6 @@ export interface StorageAdapter {
 	getTranslations(locale: string): Promise<Map<string, string>>;
 
 	/**
-	 * Get translations with source text for a locale (optimized single query)
-	 * Used for client-side hydration to avoid N+1 query
-	 * @returns Map of source text -> translated text
-	 */
-	getTranslationsWithSourceText?(locale: string): Promise<Map<string, string>>;
-
-	/**
 	 * Register source strings (batch insert, skip duplicates)
 	 */
 	registerSources(
@@ -238,10 +231,8 @@ export interface PendingSourceString {
 export interface RosettaContext {
 	locale: string;
 	defaultLocale: string;
-	/** hash -> translated text (for server lookup) */
+	/** hash -> translated text (for both server and client lookup) */
 	translations: Map<string, string>;
-	/** source -> translated text (for client) */
-	translationsForClient: Record<string, string>;
 	/** Storage adapter for flushing collected strings */
 	storage?: StorageAdapter;
 	/** Request-scoped: hashes collected this request (prevents duplicates) */

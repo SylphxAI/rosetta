@@ -32,12 +32,6 @@ export interface RosettaConfig {
 	localeDetector?: LocaleDetector;
 }
 
-interface LoadedTranslations {
-	/** hash -> translated text (for server lookup) */
-	byHash: Map<string, string>;
-	/** source -> translated text (for client) */
-	bySource: Record<string, string>;
-}
 
 /**
  * Server-side Rosetta manager
@@ -66,7 +60,7 @@ export class Rosetta {
 	private localeDetector?: LocaleDetector;
 
 	// In-memory LRU cache with separate timestamps for coherence
-	private translationCache = new Map<string, LoadedTranslations>();
+	private translationCache = new Map<string, Map<string, string>>();
 	private translationCacheTime = new Map<string, number>();
 	private cacheAccessOrder: string[] = []; // LRU tracking
 	private availableLocalesCache: string[] | null = null;
@@ -148,11 +142,12 @@ export class Rosetta {
 
 	/**
 	 * Load translations for a locale (with LRU caching)
+	 * @returns Map of hash -> translated text
 	 */
-	async loadTranslations(locale: string): Promise<LoadedTranslations> {
+	async loadTranslations(locale: string): Promise<Map<string, string>> {
 		// Default locale doesn't need translations
 		if (locale === this.defaultLocale) {
-			return { byHash: new Map(), bySource: {} };
+			return new Map();
 		}
 
 		// Check cache with per-locale timestamp
@@ -164,34 +159,15 @@ export class Rosetta {
 			return cached;
 		}
 
-		// Load from storage
-		const byHash = await this.storage.getTranslations(locale);
-		let bySource: Record<string, string>;
-
-		// Use optimized single-query method if available (avoids N+1)
-		if (this.storage.getTranslationsWithSourceText) {
-			const sourceMap = await this.storage.getTranslationsWithSourceText(locale);
-			bySource = Object.fromEntries(sourceMap);
-		} else {
-			// Fallback: build bySource map from sources (N+1 query)
-			bySource = {};
-			const sources = await this.storage.getSources();
-			for (const source of sources) {
-				const translated = byHash.get(source.hash);
-				if (translated) {
-					bySource[source.text] = translated;
-				}
-			}
-		}
-
-		const result: LoadedTranslations = { byHash, bySource };
+		// Load from storage - single query
+		const translations = await this.storage.getTranslations(locale);
 
 		// Update LRU cache with per-locale timestamp
-		this.translationCache.set(locale, result);
+		this.translationCache.set(locale, translations);
 		this.translationCacheTime.set(locale, now);
-		this.updateCacheAccess(locale); // Update LRU on cache miss (new entry)
+		this.updateCacheAccess(locale);
 
-		return result;
+		return translations;
 	}
 
 	/**
@@ -206,14 +182,13 @@ export class Rosetta {
 	 */
 	async init<T>(fn: () => T | Promise<T>): Promise<T> {
 		const locale = await this.detectLocale();
-		const loaded = await this.loadTranslations(locale);
+		const translations = await this.loadTranslations(locale);
 
 		return runWithRosetta(
 			{
 				locale,
 				defaultLocale: this.defaultLocale,
-				translations: loaded.byHash,
-				translationsForClient: loaded.bySource,
+				translations,
 				storage: this.storage,
 			},
 			() => fn()
@@ -222,6 +197,7 @@ export class Rosetta {
 
 	/**
 	 * Get Rosetta data for client hydration
+	 * @returns translations as hash -> translated text (same format as server)
 	 */
 	async getClientData(): Promise<{
 		locale: string;
@@ -230,14 +206,14 @@ export class Rosetta {
 		translations: Record<string, string>;
 	}> {
 		const locale = await this.detectLocale();
-		const loaded = await this.loadTranslations(locale);
+		const translations = await this.loadTranslations(locale);
 		const availableLocales = await this.getAvailableLocales();
 
 		return {
 			locale,
 			defaultLocale: this.defaultLocale,
 			availableLocales,
-			translations: loaded.bySource,
+			translations: Object.fromEntries(translations),
 		};
 	}
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { interpolate } from '@sylphx/rosetta';
+import { hashText, interpolate } from '@sylphx/rosetta';
 import type React from 'react';
 import { type ReactNode, createContext, useContext } from 'react';
 
@@ -23,7 +23,7 @@ export interface RosettaProviderProps {
 	children: ReactNode;
 	/** Current locale code */
 	locale: string;
-	/** Translations map (source text -> translated text) */
+	/** Translations map (hash -> translated text) */
 	translations: Record<string, string>;
 }
 
@@ -46,7 +46,7 @@ const RosettaReactContext = createContext<TranslationContextValue>({
  * @example
  * // In layout.tsx (server component)
  * import { RosettaProvider } from '@sylphx/rosetta-react';
- * import { getTranslationsForClient, getLocale } from '@sylphx/rosetta/server';
+ * import { getTranslations, getLocale } from '@sylphx/rosetta/server';
  *
  * export default async function Layout({ children }) {
  *   return rosetta.init(async () => (
@@ -54,7 +54,7 @@ const RosettaReactContext = createContext<TranslationContextValue>({
  *       <body>
  *         <RosettaProvider
  *           locale={getLocale()}
- *           translations={getTranslationsForClient()}
+ *           translations={getTranslations()}
  *         >
  *           {children}
  *         </RosettaProvider>
@@ -69,8 +69,9 @@ export function RosettaProvider({
 	children,
 }: RosettaProviderProps): React.ReactElement {
 	const t = (text: string, params?: Record<string, string | number>): string => {
-		// Direct lookup by source text (no hashing needed on client)
-		const translated = translations[text] ?? text;
+		// Use same hash-based lookup as server
+		const hash = hashText(text);
+		const translated = translations[hash] ?? text;
 		return interpolate(translated, params);
 	};
 

@@ -246,22 +246,21 @@ describe('getTranslationsForClient', () => {
 	});
 
 	test('returns translations from context', () => {
-		const translationsForClient = { 'Hello World': '你好世界' };
+		const translations = new Map([['hash123', '你好世界']]);
 
 		let result: Record<string, string> | undefined;
 		runWithRosetta(
 			{
 				locale: 'zh-TW',
 				defaultLocale: 'en',
-				translations: new Map(),
-				translationsForClient,
+				translations,
 			},
 			() => {
 				result = getTranslationsForClient();
 			}
 		);
 
-		expect(result).toEqual(translationsForClient);
+		expect(result).toEqual({ hash123: '你好世界' });
 	});
 });
 

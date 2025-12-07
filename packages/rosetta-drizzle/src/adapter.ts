@@ -145,34 +145,6 @@ export class DrizzleStorageAdapter<
 	}
 
 	/**
-	 * Get translations with source text for a locale (optimized JOIN query)
-	 * Returns source text -> translated text map for client-side hydration
-	 */
-	async getTranslationsWithSourceText(locale: string): Promise<Map<string, string>> {
-		const db = this.db as Record<string, unknown>;
-		const sources = this.sources as Record<string, unknown>;
-		const translations = this.translations as Record<string, unknown>;
-
-		// Single JOIN query instead of N+1
-		const results = (await (db.select as CallableFunction)({
-			sourceText: sources.text,
-			translatedText: translations.text,
-		})
-			.from(this.translations)
-			.innerJoin(this.sources, eq(sources.hash as Parameters<typeof eq>[0], translations.hash))
-			.where(eq(translations.locale as Parameters<typeof eq>[0], locale))) as Array<{
-			sourceText: string;
-			translatedText: string;
-		}>;
-
-		const map = new Map<string, string>();
-		for (const row of results) {
-			map.set(row.sourceText, row.translatedText);
-		}
-		return map;
-	}
-
-	/**
 	 * Register source strings (batch insert, skip duplicates)
 	 */
 	async registerSources(
