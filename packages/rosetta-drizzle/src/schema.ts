@@ -97,7 +97,7 @@ export function createRosettaSchema<T extends PostgresSchemaHelpers>(
 		(table) => [unique().on(table.locale, table.hash)]
 	);
 
-	return { rosettaSources, rosettaTranslations };
+	return { rosettaSources: rosettaSources, rosettaTranslations: rosettaTranslations };
 }
 
 // ============================================
@@ -155,7 +155,7 @@ export function createRosettaSchemaSQLite<T extends SQLiteSchemaHelpers>(
 		(table) => (unique ? [unique().on(table.locale, table.hash)] : [])
 	);
 
-	return { rosettaSources, rosettaTranslations };
+	return { rosettaSources: rosettaSources, rosettaTranslations: rosettaTranslations };
 }
 
 // ============================================
@@ -209,7 +209,7 @@ export function createRosettaSchemaMySQL<T extends MySQLSchemaHelpers>(
 		(table) => (unique ? [unique().on(table.locale, table.hash)] : [])
 	);
 
-	return { rosettaSources, rosettaTranslations };
+	return { rosettaSources: rosettaSources, rosettaTranslations: rosettaTranslations };
 }
 
 // ============================================
