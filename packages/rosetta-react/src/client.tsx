@@ -42,8 +42,8 @@ export interface RosettaClientProviderProps {
 	children: ReactNode;
 	/** Current locale code */
 	locale: string;
-	/** Default locale code */
-	defaultLocale: string;
+	/** Default locale code (defaults to 'en') */
+	defaultLocale?: string;
 	/** Translations map (hash -> translated text) */
 	translations: Record<string, string>;
 }
@@ -83,7 +83,7 @@ export const RosettaContext = createContext<TranslationContextValue>({
  */
 export function RosettaClientProvider({
 	locale,
-	defaultLocale,
+	defaultLocale = 'en',
 	translations,
 	children,
 }: RosettaClientProviderProps): React.ReactElement {

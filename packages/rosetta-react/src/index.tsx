@@ -33,3 +33,8 @@ export {
 	type TranslationContextValue,
 	type RosettaClientProviderProps,
 } from './client';
+
+// Backward compatibility: RosettaProvider as alias for RosettaClientProvider
+// Deprecated: Use RosettaProvider from '@sylphx/rosetta-react/server' for server components
+export { RosettaClientProvider as RosettaProvider } from './client';
+export type { RosettaClientProviderProps as RosettaProviderProps } from './client';
