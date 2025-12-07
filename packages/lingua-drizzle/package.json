@@ -1,0 +1,55 @@
+{
+  "name": "@sylphx/lingua-drizzle",
+  "version": "0.1.0",
+  "description": "Drizzle ORM storage adapter for @sylphx/lingua",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./schema": {
+      "types": "./dist/schema.d.ts",
+      "import": "./dist/schema.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "bunup src/index.ts src/schema.ts --dts --external drizzle-orm --external @sylphx/lingua",
+    "dev": "bunup src/index.ts src/schema.ts --dts --external drizzle-orm --external @sylphx/lingua --watch",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "peerDependencies": {
+    "@sylphx/lingua": ">=0.1.0",
+    "drizzle-orm": ">=0.30.0"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.1.14",
+    "bunup": "^0.10.0",
+    "drizzle-orm": "^0.38.0",
+    "typescript": "^5"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SylphxAI/lingua.git",
+    "directory": "packages/lingua-drizzle"
+  },
+  "homepage": "https://github.com/SylphxAI/lingua#readme",
+  "bugs": {
+    "url": "https://github.com/SylphxAI/lingua/issues"
+  },
+  "keywords": [
+    "i18n",
+    "drizzle",
+    "drizzle-orm",
+    "translation",
+    "lingua",
+    "storage-adapter"
+  ]
+}
