@@ -14,7 +14,9 @@
 			"import": "./dist/server.js"
 		}
 	},
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"scripts": {
 		"build": "bunup src/index.tsx src/server.tsx --dts --external react --external @sylphx/rosetta",
 		"dev": "bunup src/index.tsx src/server.tsx --dts --external react --external @sylphx/rosetta --watch",
@@ -44,5 +46,13 @@
 	"bugs": {
 		"url": "https://github.com/SylphxAI/rosetta/issues"
 	},
-	"keywords": ["i18n", "nextjs", "next", "translation", "rosetta", "app-router", "server-components"]
+	"keywords": [
+		"i18n",
+		"nextjs",
+		"next",
+		"translation",
+		"rosetta",
+		"app-router",
+		"server-components"
+	]
 }

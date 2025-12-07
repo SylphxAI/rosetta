@@ -14,7 +14,9 @@
 			"import": "./dist/schema.js"
 		}
 	},
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"scripts": {
 		"build": "bunup src/index.ts src/schema.ts --dts --external drizzle-orm --external @sylphx/rosetta",
 		"dev": "bunup src/index.ts src/schema.ts --dts --external drizzle-orm --external @sylphx/rosetta --watch",
@@ -44,5 +46,12 @@
 	"bugs": {
 		"url": "https://github.com/SylphxAI/rosetta/issues"
 	},
-	"keywords": ["i18n", "drizzle", "drizzle-orm", "translation", "rosetta", "storage-adapter"]
+	"keywords": [
+		"i18n",
+		"drizzle",
+		"drizzle-orm",
+		"translation",
+		"rosetta",
+		"storage-adapter"
+	]
 }
