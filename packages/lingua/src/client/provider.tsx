@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, type ReactNode } from 'react';
+import React, { createContext, useContext, type ReactNode } from 'react';
 import { interpolate } from '../interpolate';
 import type { TranslationContextValue } from '../types';
 
@@ -48,7 +48,7 @@ interface I18nProviderProps {
  *   ));
  * }
  */
-export function I18nProvider({ locale, translations, children }: I18nProviderProps) {
+export function I18nProvider({ locale, translations, children }: I18nProviderProps): React.ReactElement {
 	const t = (text: string, params?: Record<string, string | number>): string => {
 		// Direct lookup by source text (no hashing needed on client)
 		const translated = translations[text] ?? text;

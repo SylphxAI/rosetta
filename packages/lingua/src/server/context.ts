@@ -8,7 +8,7 @@ import type { I18nContext, StorageAdapter, TranslateOptions } from '../types';
 // AsyncLocalStorage for request-scoped context
 // ============================================
 
-export const i18nStorage = new AsyncLocalStorage<I18nContext>();
+export const i18nStorage: AsyncLocalStorage<I18nContext> = new AsyncLocalStorage<I18nContext>();
 
 /**
  * Get current i18n context
