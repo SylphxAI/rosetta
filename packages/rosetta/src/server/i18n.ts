@@ -117,6 +117,29 @@ export class Rosetta {
 	}
 
 	/**
+	 * Load translations for specific hashes only (fine-grained loading)
+	 * Falls back to loadTranslations if storage doesn't support it
+	 * @returns Map of hash -> translated text
+	 */
+	async loadTranslationsByHashes(
+		locale: string,
+		hashes: string[]
+	): Promise<Map<string, string>> {
+		// Default locale doesn't need translations
+		if (locale === this.defaultLocale) {
+			return new Map();
+		}
+
+		// Use fine-grained loading if available
+		if (this.storage.getTranslationsByHashes) {
+			return this.storage.getTranslationsByHashes(locale, hashes);
+		}
+
+		// Fallback to loading all translations
+		return this.storage.getTranslations(locale);
+	}
+
+	/**
 	 * Initialize Rosetta context for the current request
 	 *
 	 * @example

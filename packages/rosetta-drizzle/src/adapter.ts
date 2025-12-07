@@ -145,6 +145,40 @@ export class DrizzleStorageAdapter<
 	}
 
 	/**
+	 * Get translations for specific hashes only (fine-grained loading)
+	 * More efficient than getTranslations when you only need a subset
+	 */
+	async getTranslationsByHashes(locale: string, hashes: string[]): Promise<Map<string, string>> {
+		if (hashes.length === 0) {
+			return new Map();
+		}
+
+		const db = this.db as Record<string, unknown>;
+		const translations = this.translations as Record<string, unknown>;
+
+		const results = (await (db.select as CallableFunction)({
+			hash: translations.hash,
+			text: translations.text,
+		})
+			.from(this.translations)
+			.where(
+				and(
+					eq(translations.locale as Parameters<typeof eq>[0], locale),
+					inArray(translations.hash as Parameters<typeof inArray>[0], hashes)
+				)
+			)) as Array<{
+			hash: string;
+			text: string;
+		}>;
+
+		const map = new Map<string, string>();
+		for (const row of results) {
+			map.set(row.hash, row.text);
+		}
+		return map;
+	}
+
+	/**
 	 * Register source strings (batch insert, skip duplicates)
 	 */
 	async registerSources(

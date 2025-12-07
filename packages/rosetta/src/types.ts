@@ -146,6 +146,15 @@ export interface StorageAdapter {
 	 */
 	getAvailableLocales(): Promise<string[]>;
 
+	// ==================== Optimization Methods (Optional) ====================
+
+	/**
+	 * Get translations for specific hashes only (fine-grained loading)
+	 * If not implemented, falls back to getTranslations() which loads all
+	 * @returns Map of hash -> translated text (only for requested hashes)
+	 */
+	getTranslationsByHashes?(locale: string, hashes: string[]): Promise<Map<string, string>>;
+
 	// ==================== Admin Methods (Optional) ====================
 
 	/**
