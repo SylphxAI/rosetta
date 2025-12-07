@@ -6,6 +6,7 @@
       "name": "lingua",
       "devDependencies": {
         "@biomejs/biome": "^1.9.4",
+        "@sylphx/bump": "^1.6.1",
         "typescript": "^5.7.2",
       },
     },
