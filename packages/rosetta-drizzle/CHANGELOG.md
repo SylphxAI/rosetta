@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.1 (2025-12-07)
+
+Update drizzle-orm to 0.45.0 for better type compatibility
+
+### 🔧 Chores
+
+- **rosetta-drizzle:** update drizzle-orm to 0.45.0 ([27eb139](https://github.com/SylphxAI/rosetta/commit/27eb139ee09ff1e5848805b96f8e14243b78b8a7))
+
 ## 0.1.0 (2025-12-07)
 
 ### ✨ Features
