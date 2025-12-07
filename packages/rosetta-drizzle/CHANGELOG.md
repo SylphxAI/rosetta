@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.5 (2025-12-07)
+
+### 🐛 Bug Fixes
+
+- **rosetta-drizzle:** proper type inference with tsup ([eb9f8a5](https://github.com/SylphxAI/rosetta/commit/eb9f8a5a4254bdbca1e108953e59e8a34bdaeb89))
+
 ## 0.1.4 (2025-12-07)
 
 Export schema helpers from main entry to avoid drizzle-kit ESM issues
