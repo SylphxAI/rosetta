@@ -16,7 +16,6 @@ export { interpolate } from './interpolate';
 // Locale utilities (browser-safe)
 export {
 	ALL_LOCALES,
-	DEFAULT_ENABLED_LOCALES,
 	DEFAULT_LOCALE,
 	getLocaleEnglishName,
 	getLocaleInfo,

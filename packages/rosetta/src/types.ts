@@ -141,6 +141,11 @@ export interface StorageAdapter {
 	 */
 	getUntranslated(locale: string): Promise<SourceString[]>;
 
+	/**
+	 * Get all locales that have at least one translation
+	 */
+	getAvailableLocales(): Promise<string[]>;
+
 	// ==================== Admin Methods (Optional) ====================
 
 	/**

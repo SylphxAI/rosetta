@@ -73,11 +73,6 @@ export type LocaleCode = (typeof ALL_LOCALES)[number]['code'];
 export const DEFAULT_LOCALE = 'en';
 
 /**
- * Default enabled locales
- */
-export const DEFAULT_ENABLED_LOCALES: string[] = ['en', 'zh-TW', 'zh-CN'];
-
-/**
  * Get locale info by code
  */
 export function getLocaleInfo(code: string): LocaleInfo | undefined {

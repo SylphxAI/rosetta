@@ -332,6 +332,23 @@ export class DrizzleStorageAdapter<
 		}));
 	}
 
+	/**
+	 * Get all locales that have at least one translation
+	 */
+	async getAvailableLocales(): Promise<string[]> {
+		const db = this.db as Record<string, unknown>;
+		const translations = this.translations as Record<string, unknown>;
+
+		// SELECT DISTINCT locale FROM translations
+		const results = (await (db.select as CallableFunction)({
+			locale: translations.locale,
+		})
+			.from(this.translations)
+			.groupBy(translations.locale)) as Array<{ locale: string }>;
+
+		return results.map((r) => r.locale);
+	}
+
 	// ============================================
 	// Admin Methods
 	// ============================================

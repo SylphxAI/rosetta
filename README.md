@@ -165,7 +165,7 @@ export const i18n = new I18n({
     apiKey: process.env.OPENROUTER_API_KEY!,
   }),
   defaultLocale: 'en',
-  enabledLocales: ['en', 'zh-TW', 'zh-CN', 'ja'],
+  // Languages are discovered automatically from DB - no need to configure!
   localeDetector: async () => {
     const cookieStore = await cookies();
     return cookieStore.get('locale')?.value ?? 'en';
@@ -486,7 +486,6 @@ const i18n = new I18n({
   storage: StorageAdapter,       // Required: your storage adapter
   translator?: TranslateAdapter, // Optional: for auto-translation
   defaultLocale?: string,        // Default: 'en'
-  enabledLocales?: string[],     // Default: ['en', 'zh-TW', 'zh-CN']
   cacheTTL?: number,             // Default: 60000 (1 minute)
   localeDetector?: () => string, // Function to detect current locale
 });
@@ -508,17 +507,16 @@ await i18n.generateAllUntranslated(locale, onProgress?)
 await i18n.batchTranslate(items, locale)
 
 // Admin methods
-await i18n.getSourcesWithStatus()    // Get sources with translation status
-await i18n.getStats()                // Get translation statistics
+await i18n.getSourcesWithStatus(locales)  // Get sources with translation status
+await i18n.getStats(locales)              // Get translation statistics
 await i18n.markAsReviewed(hash, locale)
 await i18n.saveTranslationByHash(locale, hash, text, options?)
 await i18n.exportTranslations(locale)
 await i18n.importTranslations(locale, data, options?)
 
 // Utilities
-i18n.getEnabledLocales()             // Get list of enabled locales
+await i18n.getAvailableLocales()     // Get locales that have translations (from DB)
 i18n.getDefaultLocale()              // Get default locale
-i18n.getTargetLocales()              // Get non-default locales
 i18n.invalidateCache()               // Clear translation cache
 ```
 
