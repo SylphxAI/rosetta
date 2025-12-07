@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.4 (2025-12-07)
+
+Export schema helpers from main entry to avoid drizzle-kit ESM issues
+
+### ✨ Features
+
+- **rosetta-drizzle:** export schema helpers from main entry ([f6a7e55](https://github.com/SylphxAI/rosetta/commit/f6a7e559673aae6c18659fddcb7a65cd5f32ad67))
+
 ## 0.1.3 (2025-12-07)
 
 Fix DrizzleDatabase type contravariance issue
