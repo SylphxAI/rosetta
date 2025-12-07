@@ -18,7 +18,9 @@
 			"import": "./dist/adapters/index.js"
 		}
 	},
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"scripts": {
 		"build": "bunup src/index.ts src/server/index.ts src/adapters/index.ts --dts",
 		"dev": "bunup src/index.ts src/server/index.ts src/adapters/index.ts --dts --watch",
