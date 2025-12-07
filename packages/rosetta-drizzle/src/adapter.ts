@@ -60,13 +60,15 @@ export interface RosettaTranslationsTableType {
 
 /**
  * Drizzle database instance type (generic to support all dialects)
+ * Uses 'any' for method signatures to avoid contravariance issues with specific Drizzle types
  */
-export interface DrizzleDatabase {
-	select: (...args: unknown[]) => unknown;
-	insert: (...args: unknown[]) => unknown;
-	update: (...args: unknown[]) => unknown;
-	delete: (...args: unknown[]) => unknown;
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type DrizzleDatabase = {
+	select: (...args: any[]) => any;
+	insert: (...args: any[]) => any;
+	update: (...args: any[]) => any;
+	delete: (...args: any[]) => any;
+};
 
 /**
  * Configuration for DrizzleStorageAdapter
