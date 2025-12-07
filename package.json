@@ -1,5 +1,5 @@
 {
-	"name": "lingua",
+	"name": "rosetta",
 	"private": true,
 	"workspaces": ["packages/*"],
 	"scripts": {
