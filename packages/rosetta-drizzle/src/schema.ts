@@ -65,7 +65,7 @@ export interface RosettaSchemaOptions {
 export function createRosettaSchema<T extends PostgresSchemaHelpers>(
 	helpers: T,
 	options: RosettaSchemaOptions = {}
-) {
+): { rosettaSources: object; rosettaTranslations: object } {
 	const { pgTable, text, timestamp, integer, boolean, unique, serial } = helpers;
 	const sourcesTableName = options.sourcesTable ?? 'rosetta_sources';
 	const translationsTableName = options.translationsTable ?? 'rosetta_translations';
@@ -97,7 +97,8 @@ export function createRosettaSchema<T extends PostgresSchemaHelpers>(
 		(table) => [unique().on(table.locale, table.hash)]
 	);
 
-	return { rosettaSources: rosettaSources, rosettaTranslations: rosettaTranslations };
+	const result = { rosettaSources: rosettaSources, rosettaTranslations: rosettaTranslations };
+	return result;
 }
 
 // ============================================
@@ -117,7 +118,7 @@ export interface SQLiteSchemaHelpers {
 export function createRosettaSchemaSQLite<T extends SQLiteSchemaHelpers>(
 	helpers: T,
 	options: RosettaSchemaOptions = {}
-) {
+): { rosettaSources: object; rosettaTranslations: object } {
 	const { sqliteTable, text, integer, unique } = helpers;
 	const sourcesTableName = options.sourcesTable ?? 'rosetta_sources';
 	const translationsTableName = options.translationsTable ?? 'rosetta_translations';
@@ -155,7 +156,8 @@ export function createRosettaSchemaSQLite<T extends SQLiteSchemaHelpers>(
 		(table) => (unique ? [unique().on(table.locale, table.hash)] : [])
 	);
 
-	return { rosettaSources: rosettaSources, rosettaTranslations: rosettaTranslations };
+	const result = { rosettaSources: rosettaSources, rosettaTranslations: rosettaTranslations };
+	return result;
 }
 
 // ============================================
@@ -179,7 +181,7 @@ export interface MySQLSchemaHelpers {
 export function createRosettaSchemaMySQL<T extends MySQLSchemaHelpers>(
 	helpers: T,
 	options: RosettaSchemaOptions = {}
-) {
+): { rosettaSources: object; rosettaTranslations: object } {
 	const { mysqlTable, text, varchar, timestamp, int, boolean, unique, serial } = helpers;
 	const sourcesTableName = options.sourcesTable ?? 'rosetta_sources';
 	const translationsTableName = options.translationsTable ?? 'rosetta_translations';
@@ -209,7 +211,8 @@ export function createRosettaSchemaMySQL<T extends MySQLSchemaHelpers>(
 		(table) => (unique ? [unique().on(table.locale, table.hash)] : [])
 	);
 
-	return { rosettaSources: rosettaSources, rosettaTranslations: rosettaTranslations };
+	const result = { rosettaSources: rosettaSources, rosettaTranslations: rosettaTranslations };
+	return result;
 }
 
 // ============================================

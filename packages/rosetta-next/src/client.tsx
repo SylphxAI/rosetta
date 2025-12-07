@@ -197,7 +197,7 @@ function replaceHash(template: string, count: number): string {
 // Context
 // ============================================
 
-export const RosettaContext = createContext<TranslationContextValue>({
+export const RosettaContext: React.Context<TranslationContextValue> = createContext<TranslationContextValue>({
 	locale: 'en',
 	defaultLocale: 'en',
 	t: (text, paramsOrOptions) => {
