@@ -259,7 +259,7 @@ export class I18n {
 				context,
 			});
 		} catch (error) {
-			console.error('[lingua] Translation failed:', error);
+			console.error('[rosetta] Translation failed:', error);
 			return null;
 		}
 	}
@@ -517,7 +517,7 @@ export class I18n {
 				this.invalidateCache();
 				return { success, failed: items.length - success };
 			} catch (error) {
-				console.error('[lingua] Batch translation failed:', error);
+				console.error('[rosetta] Batch translation failed:', error);
 				// Fall back to sequential translation
 			}
 		}

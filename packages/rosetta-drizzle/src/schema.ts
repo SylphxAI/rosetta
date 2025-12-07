@@ -60,7 +60,7 @@ export interface RosettaSchemaOptions {
 }
 
 /**
- * Create Lingua schema for PostgreSQL
+ * Create Rosetta schema for PostgreSQL
  */
 export function createRosettaSchema<T extends PostgresSchemaHelpers>(
 	helpers: T,
@@ -112,7 +112,7 @@ export interface SQLiteSchemaHelpers {
 }
 
 /**
- * Create Lingua schema for SQLite
+ * Create Rosetta schema for SQLite
  */
 export function createRosettaSchemaSQLite<T extends SQLiteSchemaHelpers>(
 	helpers: T,
@@ -174,7 +174,7 @@ export interface MySQLSchemaHelpers {
 }
 
 /**
- * Create Lingua schema for MySQL
+ * Create Rosetta schema for MySQL
  */
 export function createRosettaSchemaMySQL<T extends MySQLSchemaHelpers>(
 	helpers: T,
@@ -217,11 +217,11 @@ export function createRosettaSchemaMySQL<T extends MySQLSchemaHelpers>(
 // ============================================
 
 /**
- * Infer the type of a Lingua sources table
+ * Infer the type of a Rosetta sources table
  */
 export type RosettaSourcesTable = ReturnType<typeof createRosettaSchema>['rosettaSources'];
 
 /**
- * Infer the type of a Lingua translations table
+ * Infer the type of a Rosetta translations table
  */
 export type RosettaTranslationsTable = ReturnType<typeof createRosettaSchema>['rosettaTranslations'];

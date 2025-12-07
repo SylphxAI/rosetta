@@ -64,7 +64,7 @@ export async function flushCollectedStrings(): Promise<void> {
 	try {
 		await ctx.storage.registerSources(items);
 	} catch (error) {
-		console.error('[lingua] Failed to flush strings:', error);
+		console.error('[rosetta] Failed to flush strings:', error);
 	}
 }
 
@@ -109,7 +109,7 @@ export function t(
 	// No store means initI18n wasn't called - fallback to source
 	if (!store) {
 		if (process.env.NODE_ENV === 'development') {
-			console.warn('[lingua] t() called outside initI18n context');
+			console.warn('[rosetta] t() called outside initI18n context');
 		}
 		return interpolate(text, params);
 	}

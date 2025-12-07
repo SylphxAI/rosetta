@@ -2,7 +2,7 @@
  * Server-side i18n module
  *
  * @example
- * import { I18n, t, flushCollectedStrings } from '@sylphx/lingua/server';
+ * import { I18n, t, flushCollectedStrings } from '@sylphx/rosetta/server';
  *
  * const i18n = new I18n({
  *   storage: myStorageAdapter,
@@ -19,7 +19,7 @@
  * }
  *
  * // In any server component
- * import { t } from '@sylphx/lingua/server';
+ * import { t } from '@sylphx/rosetta/server';
  * export function MyComponent() {
  *   return <h1>{t("Hello World")}</h1>;
  * }

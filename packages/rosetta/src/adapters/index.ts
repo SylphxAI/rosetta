@@ -1,8 +1,8 @@
 /**
- * Translation adapters for @sylphx/lingua
+ * Translation adapters for @sylphx/rosetta
  *
  * @example
- * import { OpenRouterAdapter } from '@sylphx/lingua/adapters';
+ * import { OpenRouterAdapter } from '@sylphx/rosetta/adapters';
  *
  * const translator = new OpenRouterAdapter({
  *   apiKey: process.env.OPENROUTER_API_KEY!,
