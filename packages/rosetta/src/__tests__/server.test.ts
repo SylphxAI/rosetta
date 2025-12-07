@@ -1,5 +1,13 @@
 import { beforeEach, describe, expect, test } from 'bun:test';
-import { getLocale, getTranslationsForClient, runWithRosetta, t } from '../server/context';
+import {
+	buildLocaleChain,
+	getLocale,
+	getLocaleChain,
+	getTranslationsForClient,
+	isValidLocale,
+	runWithRosetta,
+	t,
+} from '../server/context';
 import { Rosetta } from '../server/i18n';
 import type { SourceWithStatus, StorageAdapter, TranslateAdapter } from '../types';
 
@@ -229,7 +237,6 @@ describe('runWithRosetta', () => {
 				locale: 'zh-TW',
 				defaultLocale: 'en',
 				translations,
-				translationsForClient: {},
 			},
 			() => {
 				capturedLocale = getLocale();
@@ -512,5 +519,177 @@ describe('Rosetta translation generation', () => {
 
 		const translations = await storage.getTranslations('zh-TW');
 		expect(translations.size).toBe(2);
+	});
+});
+
+// ============================================
+// Locale Utilities Tests
+// ============================================
+
+describe('buildLocaleChain', () => {
+	test('returns chain for simple locale', () => {
+		const chain = buildLocaleChain('ja', 'en');
+		expect(chain).toEqual(['ja', 'en']);
+	});
+
+	test('returns chain with parent for regional locale', () => {
+		const chain = buildLocaleChain('zh-TW', 'en');
+		expect(chain).toEqual(['zh-TW', 'zh', 'en']);
+	});
+
+	test('returns chain for pt-BR', () => {
+		const chain = buildLocaleChain('pt-BR', 'en');
+		expect(chain).toEqual(['pt-BR', 'pt', 'en']);
+	});
+
+	test('avoids duplicate when default is in chain', () => {
+		const chain = buildLocaleChain('en-US', 'en');
+		expect(chain).toEqual(['en-US', 'en']);
+	});
+
+	test('handles same locale as default', () => {
+		const chain = buildLocaleChain('en', 'en');
+		expect(chain).toEqual(['en']);
+	});
+});
+
+describe('isValidLocale', () => {
+	test('validates simple locale codes', () => {
+		expect(isValidLocale('en')).toBe(true);
+		expect(isValidLocale('ja')).toBe(true);
+		expect(isValidLocale('zh')).toBe(true);
+	});
+
+	test('validates regional locale codes', () => {
+		expect(isValidLocale('zh-TW')).toBe(true);
+		expect(isValidLocale('pt-BR')).toBe(true);
+		expect(isValidLocale('en-US')).toBe(true);
+	});
+
+	test('validates script locale codes', () => {
+		expect(isValidLocale('zh-hans')).toBe(true);
+		expect(isValidLocale('zh-hant')).toBe(true);
+	});
+
+	test('rejects invalid formats', () => {
+		expect(isValidLocale('')).toBe(false);
+		expect(isValidLocale('e')).toBe(false);
+		expect(isValidLocale('eng')).toBe(false);
+		expect(isValidLocale('en_US')).toBe(false);
+		expect(isValidLocale('en-usa')).toBe(false);
+	});
+});
+
+describe('getLocaleChain', () => {
+	test('returns default chain when no context', () => {
+		expect(getLocaleChain()).toEqual(['en']);
+	});
+
+	test('returns chain from context', () => {
+		const translations = new Map();
+		let result: string[] = [];
+
+		runWithRosetta(
+			{
+				locale: 'zh-TW',
+				defaultLocale: 'en',
+				localeChain: ['zh-TW', 'zh', 'en'],
+				translations,
+			},
+			() => {
+				result = getLocaleChain();
+			}
+		);
+
+		expect(result).toEqual(['zh-TW', 'zh', 'en']);
+	});
+});
+
+// ============================================
+// ICU MessageFormat Tests
+// ============================================
+
+describe('t() with ICU MessageFormat', () => {
+	test('handles simple plural', () => {
+		const result = t('{count, plural, one {# item} other {# items}}', { count: 1 });
+		expect(result).toBe('1 item');
+	});
+
+	test('handles plural with multiple items', () => {
+		const result = t('{count, plural, one {# item} other {# items}}', { count: 5 });
+		expect(result).toBe('5 items');
+	});
+
+	test('handles plural with zero', () => {
+		const result = t('{count, plural, =0 {No items} one {# item} other {# items}}', { count: 0 });
+		expect(result).toBe('No items');
+	});
+
+	test('handles select for gender', () => {
+		const result = t('{gender, select, male {He} female {She} other {They}}', { gender: 'female' });
+		expect(result).toBe('She');
+	});
+
+	test('handles select with other fallback', () => {
+		const result = t('{gender, select, male {He} female {She} other {They}}', { gender: 'unknown' });
+		expect(result).toBe('They');
+	});
+
+	test('handles mixed ICU and interpolation', () => {
+		const translations = new Map();
+		let result = '';
+
+		runWithRosetta(
+			{
+				locale: 'en',
+				defaultLocale: 'en',
+				translations,
+			},
+			() => {
+				result = t('{count, plural, one {# item} other {# items}} in cart', { count: 3 });
+			}
+		);
+
+		expect(result).toBe('3 items in cart');
+	});
+});
+
+// ============================================
+// Locale Fallback Chain Loading Tests
+// ============================================
+
+describe('Rosetta locale fallback chain', () => {
+	test('loadTranslations() merges from fallback chain', async () => {
+		const storage = createMockStorage();
+
+		// zh has some translations
+		await storage.saveTranslation('zh', 'hash1', '你好');
+		await storage.saveTranslation('zh', 'hash2', '世界');
+
+		// zh-TW overrides hash1 only
+		await storage.saveTranslation('zh-TW', 'hash1', '你好 (台灣)');
+
+		const rosetta = new Rosetta({
+			storage,
+			defaultLocale: 'en',
+		});
+
+		const translations = await rosetta.loadTranslations('zh-TW');
+
+		// hash1 should be overridden by zh-TW
+		expect(translations.get('hash1')).toBe('你好 (台灣)');
+		// hash2 should fall back to zh
+		expect(translations.get('hash2')).toBe('世界');
+	});
+
+	test('loadTranslations() returns empty map for default locale', async () => {
+		const storage = createMockStorage();
+		const rosetta = new Rosetta({
+			storage,
+			defaultLocale: 'en',
+		});
+
+		const translations = await rosetta.loadTranslations('en');
+		expect(translations.size).toBe(0);
 	});
 });

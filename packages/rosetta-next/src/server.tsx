@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import type { Rosetta } from '@sylphx/rosetta/server';
-import { runWithRosetta, flushCollectedStrings } from '@sylphx/rosetta/server';
+import { runWithRosetta, scheduleFlush, buildLocaleChain } from '@sylphx/rosetta/server';
 import { RosettaClientProvider } from './client';
 
 // ============================================
@@ -96,10 +96,12 @@ export async function RosettaProvider({
 	hashes,
 }: RosettaProviderProps): Promise<React.ReactElement> {
 	// Load translations - fine-grained if hashes provided, otherwise all
+	// Translations are already merged from fallback chain (zh-TW → zh → en)
 	const translations = hashes
 		? await rosetta.loadTranslationsByHashes(locale, hashes)
 		: await rosetta.loadTranslations(locale);
 	const defaultLocale = rosetta.getDefaultLocale();
+	const localeChain = buildLocaleChain(locale, defaultLocale);
 
 	// Run within AsyncLocalStorage context for server components
 	// and provide React context for client components
@@ -107,13 +109,14 @@ export async function RosettaProvider({
 		{
 			locale,
 			defaultLocale,
+			localeChain,
 			translations,
 			storage: rosetta.getStorage(),
 		},
 		() => {
 			// Schedule flush at end of request (non-blocking)
-			// Using Promise.resolve().then() to defer without blocking render
-			Promise.resolve().then(() => flushCollectedStrings());
+			// Uses setImmediate/setTimeout to defer without blocking render
+			scheduleFlush();
 
 			return (
 				<RosettaClientProvider

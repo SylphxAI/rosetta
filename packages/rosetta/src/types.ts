@@ -238,9 +238,13 @@ export interface PendingSourceString {
  * Rosetta context stored in AsyncLocalStorage
  */
 export interface RosettaContext {
+	/** Current locale */
 	locale: string;
+	/** Default/source locale */
 	defaultLocale: string;
-	/** hash -> translated text (for both server and client lookup) */
+	/** Locale fallback chain (e.g., ['zh-TW', 'zh', 'en']) */
+	localeChain: string[];
+	/** hash -> translated text (merged from fallback chain) */
 	translations: Map<string, string>;
 	/** Storage adapter for flushing collected strings */
 	storage?: StorageAdapter;
@@ -248,6 +252,8 @@ export interface RosettaContext {
 	collectedHashes: Set<string>;
 	/** Request-scoped: pending strings to flush at end of request */
 	pendingStrings: PendingSourceString[];
+	/** Whether context is fully initialized */
+	initialized: boolean;
 }
 
 /**

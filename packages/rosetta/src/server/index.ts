@@ -51,14 +51,19 @@
  */
 
 export {
+	buildLocaleChain,
 	flushCollectedStrings,
 	getDefaultLocale,
-	getRosettaContext,
 	getLocale,
+	getLocaleChain,
+	getRosettaContext,
 	getTranslations,
 	getTranslationsForClient,
+	isInsideRosettaContext,
+	isValidLocale,
 	rosettaStorage,
 	runWithRosetta,
+	scheduleFlush,
 	t,
 } from './context';
 export type { RosettaConfig, LocaleDetector } from './i18n';

@@ -7,7 +7,7 @@ import type {
 	TranslateAdapter,
 	TranslationStats,
 } from '../types';
-import { runWithRosetta } from './context';
+import { buildLocaleChain, isValidLocale, runWithRosetta } from './context';
 
 /**
  * Locale detector function type
@@ -68,13 +68,23 @@ export class Rosetta {
 
 	/**
 	 * Detect current locale
-	 * Returns default locale if detected locale has no translations
+	 * Returns default locale if detected locale is invalid or has no translations
 	 */
 	async detectLocale(): Promise<string> {
 		if (this.localeDetector) {
 			const locale = await this.localeDetector();
-			// Accept any locale - translations will be empty if none exist
+			// Validate locale format and return if valid
 			if (locale && locale !== this.defaultLocale) {
+				if (!isValidLocale(locale)) {
+					if (process.env.NODE_ENV === 'development') {
+						console.warn(
+							`[rosetta] Invalid locale format: "${locale}". ` +
+								'Expected BCP 47 format (e.g., "en", "zh-TW", "pt-BR"). ' +
+								'Falling back to default locale.'
+						);
+					}
+					return this.defaultLocale;
+				}
 				return locale;
 			}
 		}
@@ -104,8 +114,9 @@ export class Rosetta {
 	}
 
 	/**
-	 * Load translations for a locale
-	 * @returns Map of hash -> translated text
+	 * Load translations for a locale with fallback chain
+	 * Falls back through locale chain (e.g., zh-TW → zh → en)
+	 * @returns Map of hash -> translated text (merged from fallback chain)
 	 */
 	async loadTranslations(locale: string): Promise<Map<string, string>> {
 		// Default locale doesn't need translations
@@ -113,13 +124,30 @@ export class Rosetta {
 			return new Map();
 		}
 
-		return this.storage.getTranslations(locale);
+		// Build fallback chain and load from each locale
+		const chain = buildLocaleChain(locale, this.defaultLocale);
+		const merged = new Map<string, string>();
+
+		// Load from fallback chain in reverse order (default first, then more specific)
+		// This way, more specific locales override less specific ones
+		for (let i = chain.length - 1; i >= 0; i--) {
+			const chainLocale = chain[i]!;
+			// Skip default locale (no translations needed)
+			if (chainLocale === this.defaultLocale) continue;
+
+			const translations = await this.storage.getTranslations(chainLocale);
+			for (const [hash, text] of translations) {
+				merged.set(hash, text);
+			}
+		}
+
+		return merged;
 	}
 
 	/**
 	 * Load translations for specific hashes only (fine-grained loading)
-	 * Falls back to loadTranslations if storage doesn't support it
-	 * @returns Map of hash -> translated text
+	 * Falls back through locale chain (e.g., zh-TW → zh → en)
+	 * @returns Map of hash -> translated text (merged from fallback chain)
 	 */
 	async loadTranslationsByHashes(
 		locale: string,
@@ -130,13 +158,27 @@ export class Rosetta {
 			return new Map();
 		}
 
-		// Use fine-grained loading if available
-		if (this.storage.getTranslationsByHashes) {
-			return this.storage.getTranslationsByHashes(locale, hashes);
+		// Build fallback chain
+		const chain = buildLocaleChain(locale, this.defaultLocale);
+		const merged = new Map<string, string>();
+
+		// Load from fallback chain in reverse order (default first, then more specific)
+		for (let i = chain.length - 1; i >= 0; i--) {
+			const chainLocale = chain[i]!;
+			// Skip default locale (no translations needed)
+			if (chainLocale === this.defaultLocale) continue;
+
+			// Use fine-grained loading if available
+			const translations = this.storage.getTranslationsByHashes
+				? await this.storage.getTranslationsByHashes(chainLocale, hashes)
+				: await this.storage.getTranslations(chainLocale);
+
+			for (const [hash, text] of translations) {
+				merged.set(hash, text);
+			}
 		}
 
-		// Fallback to loading all translations
-		return this.storage.getTranslations(locale);
+		return merged;
 	}
 
 	/**
