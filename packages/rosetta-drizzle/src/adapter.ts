@@ -66,15 +66,12 @@ export interface TranslationsTableColumns {
 }
 
 /**
- * Drizzle table with required columns (type-safe)
+ * Drizzle table with required columns
+ * These types are structural - any table with the required columns will work
  */
-export type SourcesTable = SourcesTableColumns & {
-	[key: string]: AnyColumn | unknown;
-};
+export type SourcesTable = SourcesTableColumns;
 
-export type TranslationsTable = TranslationsTableColumns & {
-	[key: string]: AnyColumn | unknown;
-};
+export type TranslationsTable = TranslationsTableColumns;
 
 /**
  * Drizzle database query builder interface
