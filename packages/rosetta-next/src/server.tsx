@@ -1,64 +1,7 @@
-import fs from 'node:fs';
-import path from 'node:path';
 import type { Rosetta } from '@sylphx/rosetta/server';
 import { buildLocaleChain, runWithRosetta } from '@sylphx/rosetta/server';
 import type { ReactNode } from 'react';
 import { RosettaClientProvider } from './client';
-
-// ============================================
-// Auto-sync manifest to storage
-// ============================================
-
-const MANIFEST_PATH = path.join(process.cwd(), '.rosetta', 'manifest.json');
-let _syncPromise: Promise<void> | null = null;
-let _synced = false;
-
-/**
- * Auto-sync extracted strings from manifest to storage
- * - Production: Runs once per server lifecycle
- * - Development: Checks on every request (hot reload support)
- */
-async function autoSyncManifest(storage: {
-	registerSources: (sources: Array<{ text: string; hash: string }>) => Promise<void>;
-}): Promise<void> {
-	const isDev = process.env.NODE_ENV !== 'production';
-
-	// In production, only sync once per server lifecycle
-	// In development, always check for new manifest (hot reload support)
-	if (!isDev && _synced) return;
-
-	// Already syncing (concurrent requests)
-	if (_syncPromise) {
-		await _syncPromise;
-		return;
-	}
-
-	// Check if manifest exists
-	if (!fs.existsSync(MANIFEST_PATH)) {
-		if (!isDev) _synced = true;
-		return;
-	}
-
-	// Sync manifest to storage
-	_syncPromise = (async () => {
-		try {
-			const manifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf-8'));
-			if (Array.isArray(manifest) && manifest.length > 0) {
-				await storage.registerSources(manifest);
-				// Delete manifest after successful sync
-				fs.unlinkSync(MANIFEST_PATH);
-				console.log(`[rosetta] ✓ Auto-synced ${manifest.length} strings to storage`);
-			}
-		} catch (error) {
-			console.error('[rosetta] Auto-sync failed:', error);
-		} finally {
-			if (!isDev) _synced = true;
-			_syncPromise = null;
-		}
-	})();
-
-	await _syncPromise;
-}
 
 // ============================================
 // Types
@@ -96,6 +39,13 @@ export interface RosettaProviderProps {
  * 1. Loads translations for the specified locale
  * 2. Sets up AsyncLocalStorage context for server components
  * 3. Provides React context for client components via RosettaClientProvider
+ *
+ * IMPORTANT: This component does NOT auto-sync strings to the database.
+ * Use `syncRosetta()` in your deployment pipeline:
+ *
+ * ```bash
+ * npm run build && npm run rosetta:sync && npm run start
+ * ```
  *
  * @example
  * // Basic usage - loads all translations
@@ -152,9 +102,6 @@ export async function RosettaProvider({
 	children,
 	hashes,
 }: RosettaProviderProps): Promise<React.ReactElement> {
-	// Auto-sync manifest to storage on first render (once per server lifecycle)
-	await autoSyncManifest(rosetta.getStorage());
-
 	// Load translations - fine-grained if hashes provided, otherwise all
 	// Translations are already merged from fallback chain (zh-TW → zh → en)
 	const translations = hashes

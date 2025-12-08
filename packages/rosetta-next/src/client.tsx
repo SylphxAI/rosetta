@@ -56,12 +56,16 @@ export interface RosettaClientProviderProps {
  * Format message with ICU-like syntax support
  * Supports: {name}, {count, plural, one {...} other {...}}, {gender, select, ...}
  */
-function formatMessage(text: string, params?: Record<string, string | number>): string {
+function formatMessage(
+	text: string,
+	params?: Record<string, string | number>,
+	locale?: string
+): string {
 	if (!params) return text;
 
 	// Check for ICU patterns
 	if (text.includes(', plural,') || text.includes(', select,')) {
-		return formatICU(text, params);
+		return formatICU(text, params, locale);
 	}
 
 	// Simple interpolation
@@ -72,7 +76,7 @@ function formatMessage(text: string, params?: Record<string, string | number>): 
  * Basic ICU MessageFormat support
  * Handles plural and select patterns
  */
-function formatICU(text: string, params: Record<string, string | number>): string {
+function formatICU(text: string, params: Record<string, string | number>, locale?: string): string {
 	let result = text;
 	let startIndex = 0;
 
@@ -119,8 +123,8 @@ function formatICU(text: string, params: Record<string, string | number>): strin
 			if (optionMap[`=${count}`]) {
 				replacement = replaceHash(optionMap[`=${count}`]!, count);
 			} else {
-				// Then try plural category
-				const category = getPluralCategory(count);
+				// Then try plural category (using actual locale)
+				const category = getPluralCategory(count, locale);
 				const template = optionMap[category] ?? optionMap.other;
 				replacement = template ? replaceHash(template, count) : result.slice(matchStart, matchEnd);
 			}
@@ -177,12 +181,15 @@ function parseICUOptions(options: string): Record<string, string> {
 }
 
 /**
- * Get plural category for a number
+ * Get plural category for a number using the correct locale
+ * Uses Intl.PluralRules for proper CLDR pluralization
  */
-function getPluralCategory(count: number): string {
+function getPluralCategory(count: number, locale?: string): string {
 	if (typeof Intl !== 'undefined' && Intl.PluralRules) {
-		return new Intl.PluralRules('en').select(count);
+		// Use provided locale, or 'en' as fallback
+		return new Intl.PluralRules(locale ?? 'en').select(count);
 	}
+	// Fallback for environments without Intl
 	return count === 1 ? 'one' : 'other';
 }
 
@@ -202,12 +209,12 @@ export const RosettaContext: React.Context<TranslationContextValue> =
 		locale: 'en',
 		defaultLocale: 'en',
 		t: (text, paramsOrOptions) => {
-			// Default fallback: format without translation
+			// Default fallback: format without translation (uses 'en' as default locale)
 			const params =
 				paramsOrOptions && 'params' in paramsOrOptions
 					? (paramsOrOptions as TranslateOptions).params
 					: (paramsOrOptions as Record<string, string | number> | undefined);
-			return formatMessage(text, params);
+			return formatMessage(text, params, 'en');
 		},
 	});
 
@@ -234,6 +241,7 @@ export function RosettaClientProvider({
 	children,
 }: RosettaClientProviderProps): React.ReactElement {
 	// Memoize t function to prevent unnecessary re-renders
+	// Include locale in deps to update when locale changes
 	const t = useMemo<TranslateFunction>(() => {
 		return (text, paramsOrOptions) => {
 			// Determine if paramsOrOptions is TranslateOptions or direct interpolation params
@@ -256,10 +264,10 @@ export function RosettaClientProvider({
 			// Use same hash-based lookup as server (with context support)
 			const hash = hashText(text, context);
 			const translated = translations[hash] ?? text;
-			// Use formatMessage for ICU support (plural, select)
-			return formatMessage(translated, params);
+			// Use formatMessage for ICU support (plural, select) with correct locale
+			return formatMessage(translated, params, locale);
 		};
-	}, [translations]);
+	}, [translations, locale]);
 
 	return (
 		<RosettaContext.Provider value={{ locale, defaultLocale, t }}>
