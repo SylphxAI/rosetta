@@ -1,22 +1,17 @@
 'use client';
 
-import { hashText, interpolate } from '@sylphx/rosetta';
+import { hashText } from '@sylphx/rosetta';
+import { createPluralRulesCache, formatMessage } from '@sylphx/rosetta/icu';
 import type React from 'react';
 import { type ReactNode, createContext, useContext, useMemo } from 'react';
 
 // ============================================
-// Safety Constants
+// Client-side PluralRules Cache
 // ============================================
 
-const MAX_ICU_NESTING_DEPTH = 5;
-const MAX_TEXT_LENGTH = 50000;
-
-// ============================================
-// Caches (Performance)
-// ============================================
-
-// Cache for Intl.PluralRules instances (2-5x faster for plurals)
-const pluralRulesCache = new Map<string, Intl.PluralRules>();
+// Smaller cache for client (browser memory constraints)
+// LRU eviction prevents memory leaks in long-lived sessions
+const clientPluralRulesCache = createPluralRulesCache({ maxSize: 10 });
 
 // ============================================
 // Types
@@ -63,220 +58,6 @@ export interface RosettaClientProviderProps {
 }
 
 // ============================================
-// ICU MessageFormat Support
-// ============================================
-
-/**
- * Format message with ICU-like syntax support
- * Supports: {name}, {count, plural, one {...} other {...}}, {gender, select, ...}
- *
- * Features:
- * - Depth limiting to prevent DoS attacks
- * - Length limiting for safety
- * - Pattern caching for performance
- */
-function formatMessage(
-	text: string,
-	params?: Record<string, string | number>,
-	locale?: string
-): string {
-	if (!params) return text;
-
-	// Safety: Limit text length
-	if (text.length > MAX_TEXT_LENGTH) {
-		console.warn('[rosetta] Translation too long, truncating');
-		text = text.slice(0, MAX_TEXT_LENGTH);
-	}
-
-	// Check for ICU patterns
-	if (text.includes(', plural,') || text.includes(', select,')) {
-		try {
-			return formatICU(text, params, locale, 0);
-		} catch (error) {
-			// Graceful fallback on ICU parsing errors
-			console.error('[rosetta] ICU formatting error:', error);
-			return interpolate(text, params);
-		}
-	}
-
-	// Simple interpolation
-	return interpolate(text, params);
-}
-
-/**
- * Basic ICU MessageFormat support
- * Handles plural and select patterns
- *
- * Security features:
- * - Depth limiting to prevent stack overflow
- * - Iteration limiting to prevent infinite loops
- */
-function formatICU(
-	text: string,
-	params: Record<string, string | number>,
-	locale?: string,
-	depth: number = 0
-): string {
-	// Security: Prevent deeply nested patterns (DoS attack vector)
-	if (depth > MAX_ICU_NESTING_DEPTH) {
-		console.warn('[rosetta] Max ICU nesting depth exceeded, aborting');
-		return text;
-	}
-
-	let result = text;
-	let startIndex = 0;
-	let iterations = 0;
-	const maxIterations = 100; // Prevent infinite loops
-
-	while (startIndex < result.length && iterations < maxIterations) {
-		iterations++;
-
-		// Find pattern start: {varName, plural/select,
-		const patternMatch = result.slice(startIndex).match(/\{(\w+),\s*(plural|select),\s*/);
-		if (!patternMatch || patternMatch.index === undefined) break;
-
-		const matchStart = startIndex + patternMatch.index;
-		const varName = patternMatch[1]!;
-		const type = patternMatch[2]!;
-		const optionsStart = matchStart + patternMatch[0].length;
-
-		// Find matching closing brace by counting brace depth
-		let braceCount = 1;
-		let braceDepth = 1;
-		let i = optionsStart;
-		while (i < result.length && braceCount > 0) {
-			if (result[i] === '{') {
-				braceCount++;
-				braceDepth++;
-				// Security: Check nesting depth during parsing
-				if (braceDepth > MAX_ICU_NESTING_DEPTH) {
-					console.warn('[rosetta] Max brace nesting depth exceeded');
-					return text;
-				}
-			} else if (result[i] === '}') {
-				braceCount--;
-			}
-			i++;
-		}
-
-		if (braceCount !== 0) {
-			startIndex = matchStart + 1;
-			continue;
-		}
-
-		const matchEnd = i;
-		const options = result.slice(optionsStart, matchEnd - 1);
-		const value = params[varName];
-
-		if (value === undefined) {
-			startIndex = matchEnd;
-			continue;
-		}
-
-		// Parse options like "one {text}" or "=0 {text}"
-		const optionMap = parseICUOptions(options);
-		let replacement: string;
-
-		if (type === 'plural') {
-			const count = Number(value);
-			// Try exact match first (=0, =1, etc.)
-			if (optionMap[`=${count}`]) {
-				replacement = replaceHash(optionMap[`=${count}`]!, count);
-			} else {
-				// Then try plural category (using actual locale)
-				const category = getPluralCategory(count, locale);
-				const template = optionMap[category] ?? optionMap.other;
-				replacement = template ? replaceHash(template, count) : result.slice(matchStart, matchEnd);
-			}
-		} else if (type === 'select') {
-			const key = String(value);
-			replacement = optionMap[key] ?? optionMap.other ?? result.slice(matchStart, matchEnd);
-		} else {
-			startIndex = matchEnd;
-			continue;
-		}
-
-		// Recursively format nested patterns (with increased depth)
-		if (replacement.includes(', plural,') || replacement.includes(', select,')) {
-			replacement = formatICU(replacement, params, locale, depth + 1);
-		}
-
-		result = result.slice(0, matchStart) + replacement + result.slice(matchEnd);
-		startIndex = matchStart + replacement.length;
-	}
-
-	return result;
-}
-
-/**
- * Parse ICU options string into a map
- * Handles nested braces in option values
- */
-function parseICUOptions(options: string): Record<string, string> {
-	const result: Record<string, string> = {};
-	let i = 0;
-
-	while (i < options.length) {
-		// Skip whitespace
-		while (i < options.length && /\s/.test(options[i]!)) i++;
-		if (i >= options.length) break;
-
-		// Find key (word or =N)
-		const keyMatch = options.slice(i).match(/^([\w=]+)\s*\{/);
-		if (!keyMatch) break;
-
-		const key = keyMatch[1]!;
-		i += keyMatch[0].length;
-
-		// Find matching closing brace
-		let braceCount = 1;
-		const valueStart = i;
-		while (i < options.length && braceCount > 0) {
-			if (options[i] === '{') braceCount++;
-			else if (options[i] === '}') braceCount--;
-			i++;
-		}
-
-		if (braceCount === 0) {
-			result[key] = options.slice(valueStart, i - 1);
-		}
-	}
-
-	return result;
-}
-
-/**
- * Get plural category for a number using the correct locale
- * Uses Intl.PluralRules for proper CLDR pluralization
- * Caches PluralRules instances for 2-5x performance improvement
- */
-function getPluralCategory(count: number, locale?: string): string {
-	if (typeof Intl !== 'undefined' && Intl.PluralRules) {
-		const key = locale ?? 'en';
-
-		// Use cached PluralRules instance
-		let rules = pluralRulesCache.get(key);
-		if (!rules) {
-			rules = new Intl.PluralRules(key);
-			pluralRulesCache.set(key, rules);
-		}
-
-		return rules.select(count);
-	}
-	// Fallback for environments without Intl
-	return count === 1 ? 'one' : 'other';
-}
-
-/**
- * Replace # with the count in plural templates
- * Uses replacer function to avoid $ interpretation security issue
- */
-function replaceHash(template: string, count: number): string {
-	// Use replacer function to avoid $ special character interpretation
-	return template.replace(/#/g, () => String(count));
-}
-
-// ============================================
 // Context
 // ============================================
 
@@ -290,7 +71,10 @@ export const RosettaContext: React.Context<TranslationContextValue> =
 				paramsOrOptions && 'params' in paramsOrOptions
 					? (paramsOrOptions as TranslateOptions).params
 					: (paramsOrOptions as Record<string, string | number> | undefined);
-			return formatMessage(text, params, 'en');
+			return formatMessage(text, params, {
+				locale: 'en',
+				pluralRulesCache: clientPluralRulesCache,
+			});
 		},
 	});
 
@@ -349,8 +133,14 @@ export function RosettaClientProvider({
 				// Map.get() is safe from prototype pollution
 				const hash = hashText(text, context);
 				const translated = translationsMap.get(hash) ?? text;
-				// Use formatMessage for ICU support (plural, select) with correct locale
-				return formatMessage(translated, params, locale);
+				// Use shared formatMessage for ICU support with correct locale and LRU cache
+				return formatMessage(translated, params, {
+					locale,
+					pluralRulesCache: clientPluralRulesCache,
+					onError: (error, ctx) => {
+						console.error(`[rosetta] ${ctx} error:`, error.message);
+					},
+				});
 			} catch (error) {
 				// Error boundary: return original text on any error
 				console.error('[rosetta] Translation error:', error);

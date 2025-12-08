@@ -17,6 +17,10 @@
 			"types": "./dist/adapters/index.d.ts",
 			"import": "./dist/adapters/index.js"
 		},
+		"./icu": {
+			"types": "./dist/icu.d.ts",
+			"import": "./dist/icu.js"
+		},
 		"./cli": {
 			"types": "./dist/cli/index.d.ts",
 			"import": "./dist/cli/index.js"
@@ -27,8 +31,8 @@
 	},
 	"files": ["dist"],
 	"scripts": {
-		"build": "bunup src/index.ts src/server/index.ts src/adapters/index.ts src/cli/index.ts --dts",
-		"dev": "bunup src/index.ts src/server/index.ts src/adapters/index.ts --dts --watch",
+		"build": "bunup src/index.ts src/server/index.ts src/adapters/index.ts src/icu.ts src/cli/index.ts --dts",
+		"dev": "bunup src/index.ts src/server/index.ts src/adapters/index.ts src/icu.ts --dts --watch",
 		"test": "bun test",
 		"typecheck": "tsc --noEmit",
 		"clean": "rm -rf dist",
