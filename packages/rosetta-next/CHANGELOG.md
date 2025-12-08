@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.5 (2025-12-08)
+
+### 🐛 Bug Fixes
+
+- **rosetta-next:** add CJS exports for Next.js config compatibility ([f6f0c7c](https://github.com/SylphxAI/rosetta/commit/f6f0c7cc1d5665305d767c62ed7c1722f657dd45))
+
 ## 0.1.4 (2025-12-08)
 
 ### 🐛 Bug Fixes
