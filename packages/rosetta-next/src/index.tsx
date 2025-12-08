@@ -55,3 +55,16 @@ export {
 	LOCALE_COOKIE_MAX_AGE,
 	type SetLocaleCookieOptions,
 } from './locale-client';
+
+// Re-export locale data (for convenience, also available from /locales)
+export {
+	getAllLocales,
+	getCommonLocales,
+	getLocaleByCode,
+	searchLocales,
+	isValidLocale,
+	ALL_LOCALES,
+	COMMON_LOCALES,
+	COMMON_LOCALE_CODES,
+	type LocaleInfo,
+} from './locales';
