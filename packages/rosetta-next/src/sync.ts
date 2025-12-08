@@ -5,9 +5,17 @@
  * ```ts
  * // next.config.ts
  * import { withRosetta } from '@sylphx/rosetta-next/sync';
+ *
+ * export default withRosetta(nextConfig);
+ * ```
+ *
+ * Then sync strings to DB after build:
+ * ```ts
+ * // scripts/sync-rosetta.ts
+ * import { syncRosetta } from '@sylphx/rosetta-next/sync';
  * import { storage } from './src/lib/rosetta';
  *
- * export default withRosetta(nextConfig, { storage });
+ * await syncRosetta(storage);
  * ```
  */
 
@@ -43,8 +51,6 @@ function clearManifest(): void {
 }
 
 export interface RosettaPluginOptions {
-	/** Storage adapter to sync to */
-	storage: StorageAdapter;
 	/** Verbose logging (default: true in development) */
 	verbose?: boolean;
 }
@@ -55,12 +61,25 @@ type NextConfig = Record<string, any>;
 
 /**
  * Sync extracted strings from manifest to storage
+ *
+ * Run this AFTER build completes, not during build.
+ * Typically in a postbuild script or during deployment.
+ *
+ * @example
+ * ```ts
+ * // scripts/sync-rosetta.ts
+ * import { syncRosetta } from '@sylphx/rosetta-next/sync';
+ * import { storage } from '../src/lib/rosetta-storage';
+ *
+ * await syncRosetta(storage, { verbose: true });
+ * ```
  */
 export async function syncRosetta(
 	storage: StorageAdapter,
-	options?: { verbose?: boolean }
+	options?: { verbose?: boolean; clearAfterSync?: boolean }
 ): Promise<{ synced: number }> {
 	const verbose = options?.verbose ?? false;
+	const clearAfterSync = options?.clearAfterSync ?? true;
 	const strings = readManifest();
 
 	if (strings.length === 0) {
@@ -78,7 +97,9 @@ export async function syncRosetta(
 	await storage.registerSources(strings);
 
 	// Clear manifest after successful sync
-	clearManifest();
+	if (clearAfterSync) {
+		clearManifest();
+	}
 
 	if (verbose) {
 		console.log(`[rosetta] ✓ Synced ${strings.length} strings`);
@@ -87,56 +108,36 @@ export async function syncRosetta(
 	return { synced: strings.length };
 }
 
-// Store reference to storage for webpack plugin
-let _storage: StorageAdapter | null = null;
-let _verbose = false;
-
 /**
- * Webpack plugin that syncs strings after build completes
- */
-class RosettaSyncPlugin {
-	apply(compiler: { hooks: { done: { tapPromise: (name: string, fn: () => Promise<void>) => void } } }) {
-		compiler.hooks.done.tapPromise('RosettaSyncPlugin', async () => {
-			if (_storage) {
-				await syncRosetta(_storage, { verbose: _verbose });
-			}
-		});
-	}
-}
-
-/**
- * Create a Next.js config with Rosetta integration
+ * Create a Next.js config with Rosetta loader integration
  *
- * Automatically:
- * 1. Adds Turbopack loader for string extraction
- * 2. Syncs extracted strings to storage after build
+ * This ONLY adds the Turbopack/Webpack loader for string extraction.
+ * Strings are written to .rosetta/manifest.json during build.
+ *
+ * To sync strings to your database, run syncRosetta() in a postbuild script.
  *
  * @example
  * ```ts
  * // next.config.ts
  * import { withRosetta } from '@sylphx/rosetta-next/sync';
- * import { storage } from './src/lib/rosetta';
  *
  * export default withRosetta({
  *   // your next config
- * }, { storage });
+ * });
  * ```
  */
-export function withRosetta<T extends NextConfig>(
-	nextConfig: T,
-	options: RosettaPluginOptions
-): T {
-	const { storage, verbose = process.env.NODE_ENV !== 'production' } = options;
-
-	// Store for plugin access
-	_storage = storage;
-	_verbose = verbose;
+export function withRosetta<T extends NextConfig>(nextConfig: T, options?: RosettaPluginOptions): T {
+	const verbose = options?.verbose ?? process.env.NODE_ENV !== 'production';
 
 	// Get loader path - use require.resolve at runtime
 	// Use computed string to prevent bundler from resolving at build time
 	const loaderPackage = '@sylphx/rosetta-next' + '/loader';
 	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	const loaderPath = require.resolve(loaderPackage);
+
+	if (verbose) {
+		console.log('[rosetta] Adding loader for string extraction');
+	}
 
 	return {
 		...nextConfig,
@@ -153,9 +154,12 @@ export function withRosetta<T extends NextConfig>(
 				},
 			},
 		},
-		// Add webpack plugin for sync (for webpack builds)
-		webpack: (config: { plugins: unknown[] }, context: unknown) => {
-			config.plugins.push(new RosettaSyncPlugin());
+		// Add webpack loader (for webpack builds)
+		webpack: (config: { module: { rules: unknown[] } }, context: unknown) => {
+			config.module.rules.push({
+				test: /\.(ts|tsx)$/,
+				use: [loaderPath],
+			});
 
 			if (nextConfig.webpack) {
 				return nextConfig.webpack(config, context);
