@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.13 (2025-12-08)
+
+### 🐛 Bug Fixes
+
+- **rosetta-drizzle:** simplify table types for Drizzle compatibility ([c38bae0](https://github.com/SylphxAI/rosetta/commit/c38bae09babfddd7d9ce55e4bf9752956669ca55))
+
 ## 0.1.12 (2025-12-08)
 
 ### ✨ Features

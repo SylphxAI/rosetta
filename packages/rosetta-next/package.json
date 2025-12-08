@@ -1,6 +1,6 @@
 {
 	"name": "@sylphx/rosetta-next",
-	"version": "0.1.12",
+	"version": "0.1.13",
 	"description": "Next.js integration for @sylphx/rosetta i18n",
 	"license": "MIT",
 	"type": "module",
