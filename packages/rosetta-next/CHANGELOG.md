@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.6 (2025-12-08)
+
+### 🐛 Bug Fixes
+
+- **rosetta-next:** fix Turbopack/Next.js compatibility issues ([7774c41](https://github.com/SylphxAI/rosetta/commit/7774c41eca1e79ed14fb71191292b3f3a8c2d4a8))
+
 ## 0.1.5 (2025-12-08)
 
 ### 🐛 Bug Fixes
