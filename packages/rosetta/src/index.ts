@@ -40,3 +40,27 @@ export type {
 	// Context types
 	RosettaContext,
 } from './types';
+
+// Validation utilities (browser-safe)
+export {
+	// Constants
+	MAX_TEXT_LENGTH,
+	MAX_LOCALE_LENGTH,
+	MAX_CONTEXT_LENGTH,
+	MAX_HASH_LENGTH,
+	MAX_BATCH_SIZE,
+	// Validation functions
+	validateText,
+	validateLocale,
+	validateContext,
+	validateHash,
+	validateBatchSize,
+	// Assertion helpers
+	assertValidText,
+	assertValidLocale,
+	assertValidContext,
+	assertValidHash,
+	assertValidBatchSize,
+	// Types
+	type ValidationResult,
+} from './validation';
