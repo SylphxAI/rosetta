@@ -427,9 +427,11 @@ export function withRosetta<T extends NextConfig>(
 			},
 		},
 		// Add webpack loader (for webpack builds)
+		// enforce: 'pre' ensures our loader runs before other loaders (e.g., babel, swc)
 		webpack: (config: { module: { rules: unknown[] } }, context: unknown) => {
 			config.module.rules.push({
 				test: /\.(ts|tsx)$/,
+				enforce: 'pre',
 				use: [loaderPath],
 			});
 
