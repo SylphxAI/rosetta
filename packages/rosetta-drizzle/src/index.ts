@@ -28,7 +28,11 @@
 export {
 	DrizzleStorageAdapter,
 	type DrizzleStorageAdapterConfig,
-	type DrizzleDatabase,
+	type DrizzleQueryBuilder,
+	type SourcesTable,
+	type TranslationsTable,
+	type SourcesTableColumns,
+	type TranslationsTableColumns,
 } from './adapter';
 
 // Re-export schema helpers from main entry (avoids drizzle-kit ESM subpath issues)
