@@ -121,12 +121,12 @@ function formatICU(text: string, params: Record<string, string | number>): strin
 			} else {
 				// Then try plural category
 				const category = getPluralCategory(count);
-				const template = optionMap[category] ?? optionMap['other'];
+				const template = optionMap[category] ?? optionMap.other;
 				replacement = template ? replaceHash(template, count) : result.slice(matchStart, matchEnd);
 			}
 		} else if (type === 'select') {
 			const key = String(value);
-			replacement = optionMap[key] ?? optionMap['other'] ?? result.slice(matchStart, matchEnd);
+			replacement = optionMap[key] ?? optionMap.other ?? result.slice(matchStart, matchEnd);
 		} else {
 			startIndex = matchEnd;
 			continue;
@@ -197,18 +197,19 @@ function replaceHash(template: string, count: number): string {
 // Context
 // ============================================
 
-export const RosettaContext: React.Context<TranslationContextValue> = createContext<TranslationContextValue>({
-	locale: 'en',
-	defaultLocale: 'en',
-	t: (text, paramsOrOptions) => {
-		// Default fallback: format without translation
-		const params =
-			paramsOrOptions && 'params' in paramsOrOptions
-				? (paramsOrOptions as TranslateOptions).params
-				: (paramsOrOptions as Record<string, string | number> | undefined);
-		return formatMessage(text, params);
-	},
-});
+export const RosettaContext: React.Context<TranslationContextValue> =
+	createContext<TranslationContextValue>({
+		locale: 'en',
+		defaultLocale: 'en',
+		t: (text, paramsOrOptions) => {
+			// Default fallback: format without translation
+			const params =
+				paramsOrOptions && 'params' in paramsOrOptions
+					? (paramsOrOptions as TranslateOptions).params
+					: (paramsOrOptions as Record<string, string | number> | undefined);
+			return formatMessage(text, params);
+		},
+	});
 
 // ============================================
 // Client Provider
@@ -261,7 +262,9 @@ export function RosettaClientProvider({
 	}, [translations]);
 
 	return (
-		<RosettaContext.Provider value={{ locale, defaultLocale, t }}>{children}</RosettaContext.Provider>
+		<RosettaContext.Provider value={{ locale, defaultLocale, t }}>
+			{children}
+		</RosettaContext.Provider>
 	);
 }
 

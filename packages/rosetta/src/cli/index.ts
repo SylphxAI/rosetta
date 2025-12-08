@@ -6,8 +6,8 @@
  *   extract - Extract t() strings from source files
  */
 
+import type { PendingSourceString, StorageAdapter } from '../types';
 import { extract, formatResult } from './extract';
-import type { StorageAdapter, PendingSourceString } from '../types';
 
 interface CLIOptions {
 	/** Root directory to scan */
@@ -117,7 +117,9 @@ async function runExtract(options: CLIOptions): Promise<void> {
 		if (result.strings.length > 0 && verbose) {
 			console.log('\nStrings:');
 			for (const str of result.strings) {
-				console.log(`  [${str.hash}] ${str.text.substring(0, 60)}${str.text.length > 60 ? '...' : ''}`);
+				console.log(
+					`  [${str.hash}] ${str.text.substring(0, 60)}${str.text.length > 60 ? '...' : ''}`
+				);
 			}
 		}
 	}

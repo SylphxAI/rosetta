@@ -631,7 +631,9 @@ describe('t() with ICU MessageFormat', () => {
 	});
 
 	test('handles select with other fallback', () => {
-		const result = t('{gender, select, male {He} female {She} other {They}}', { gender: 'unknown' });
+		const result = t('{gender, select, male {He} female {She} other {They}}', {
+			gender: 'unknown',
+		});
 		expect(result).toBe('They');
 	});
 

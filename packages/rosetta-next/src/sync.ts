@@ -19,9 +19,9 @@
  * ```
  */
 
-import type { StorageAdapter } from '@sylphx/rosetta';
 import fs from 'node:fs';
 import path from 'node:path';
+import type { StorageAdapter } from '@sylphx/rosetta';
 
 // Inline manifest functions to avoid bunup duplicate export bug
 const MANIFEST_DIR = '.rosetta';
@@ -126,7 +126,10 @@ export async function syncRosetta(
  * });
  * ```
  */
-export function withRosetta<T extends NextConfig>(nextConfig: T, options?: RosettaPluginOptions): T {
+export function withRosetta<T extends NextConfig>(
+	nextConfig: T,
+	options?: RosettaPluginOptions
+): T {
 	const verbose = options?.verbose ?? process.env.NODE_ENV !== 'production';
 
 	// Get loader path - use require.resolve at runtime

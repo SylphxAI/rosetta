@@ -8,7 +8,8 @@ import type { RosettaContext, TranslateOptions } from '../types';
 // AsyncLocalStorage for request-scoped context
 // ============================================
 
-export const rosettaStorage: AsyncLocalStorage<RosettaContext> = new AsyncLocalStorage<RosettaContext>();
+export const rosettaStorage: AsyncLocalStorage<RosettaContext> =
+	new AsyncLocalStorage<RosettaContext>();
 
 /**
  * Get current Rosetta context
@@ -86,7 +87,8 @@ export function runWithRosetta<T>(options: RunWithRosettaOptions, fn: () => T): 
 	}
 
 	// Build locale chain if not provided
-	const localeChain = options.localeChain ?? buildLocaleChain(options.locale, options.defaultLocale);
+	const localeChain =
+		options.localeChain ?? buildLocaleChain(options.locale, options.defaultLocale);
 
 	// Create context
 	const fullContext: RosettaContext = {
@@ -157,15 +159,14 @@ export function t(
 		if (process.env.NODE_ENV === 'development') {
 			// Check if this is module scope (likely a mistake)
 			const stack = new Error().stack;
-			const isModuleScope = stack?.includes('at Module._compile') ||
+			const isModuleScope =
+				stack?.includes('at Module._compile') ||
 				stack?.includes('at Object.<anonymous>') ||
 				!stack?.includes('renderWithHooks');
 
 			if (isModuleScope) {
 				console.warn(
-					`[rosetta] t("${text.slice(0, 30)}${text.length > 30 ? '...' : ''}") called outside RosettaProvider context.\n` +
-					'This usually means t() was called at module scope instead of inside a component.\n' +
-					'Move t() calls inside component functions to ensure proper context.'
+					`[rosetta] t("${text.slice(0, 30)}${text.length > 30 ? '...' : ''}") called outside RosettaProvider context.\nThis usually means t() was called at module scope instead of inside a component.\nMove t() calls inside component functions to ensure proper context.`
 				);
 			} else {
 				console.warn('[rosetta] t() called outside RosettaProvider context');
@@ -197,8 +198,7 @@ function parseTranslateOptions(
 	// Check if it's TranslateOptions (has context or params keys only)
 	const keys = Object.keys(paramsOrOptions);
 	const isTranslateOptions =
-		keys.length > 0 &&
-		keys.every((k) => k === 'context' || k === 'params');
+		keys.length > 0 && keys.every((k) => k === 'context' || k === 'params');
 
 	if (isTranslateOptions) {
 		const opts = paramsOrOptions as TranslateOptions;
@@ -281,12 +281,12 @@ function formatICU(text: string, params: Record<string, string | number>): strin
 			} else {
 				// Then try plural category
 				const category = getPluralCategory(count);
-				const template = optionMap[category] ?? optionMap['other'];
+				const template = optionMap[category] ?? optionMap.other;
 				replacement = template ? replaceHash(template, count) : result.slice(matchStart, matchEnd);
 			}
 		} else if (type === 'select') {
 			const key = String(value);
-			replacement = optionMap[key] ?? optionMap['other'] ?? result.slice(matchStart, matchEnd);
+			replacement = optionMap[key] ?? optionMap.other ?? result.slice(matchStart, matchEnd);
 		} else {
 			startIndex = matchEnd;
 			continue;

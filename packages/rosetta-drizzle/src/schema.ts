@@ -26,28 +26,24 @@
  */
 
 import {
+	boolean as pgBoolean,
+	integer as pgInteger,
 	pgTable,
 	text as pgText,
 	timestamp as pgTimestamp,
-	integer as pgInteger,
-	boolean as pgBoolean,
 	unique as pgUnique,
 } from 'drizzle-orm/pg-core';
 
-import {
-	sqliteTable,
-	text as sqliteText,
-	integer as sqliteInteger,
-} from 'drizzle-orm/sqlite-core';
+import { integer as sqliteInteger, sqliteTable, text as sqliteText } from 'drizzle-orm/sqlite-core';
 
 import {
+	boolean as mysqlBoolean,
+	int as mysqlInt,
 	mysqlTable,
 	text as mysqlText,
-	varchar as mysqlVarchar,
 	timestamp as mysqlTimestamp,
-	int as mysqlInt,
-	boolean as mysqlBoolean,
 	unique as mysqlUnique,
+	varchar as mysqlVarchar,
 } from 'drizzle-orm/mysql-core';
 
 // ============================================

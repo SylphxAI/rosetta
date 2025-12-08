@@ -78,9 +78,7 @@ export class Rosetta {
 				if (!isValidLocale(locale)) {
 					if (process.env.NODE_ENV === 'development') {
 						console.warn(
-							`[rosetta] Invalid locale format: "${locale}". ` +
-								'Expected BCP 47 format (e.g., "en", "zh-TW", "pt-BR"). ' +
-								'Falling back to default locale.'
+							`[rosetta] Invalid locale format: "${locale}". Expected BCP 47 format (e.g., "en", "zh-TW", "pt-BR"). Falling back to default locale.`
 						);
 					}
 					return this.defaultLocale;
@@ -149,10 +147,7 @@ export class Rosetta {
 	 * Falls back through locale chain (e.g., zh-TW → zh → en)
 	 * @returns Map of hash -> translated text (merged from fallback chain)
 	 */
-	async loadTranslationsByHashes(
-		locale: string,
-		hashes: string[]
-	): Promise<Map<string, string>> {
+	async loadTranslationsByHashes(locale: string, hashes: string[]): Promise<Map<string, string>> {
 		// Default locale doesn't need translations
 		if (locale === this.defaultLocale) {
 			return new Map();

@@ -1,9 +1,9 @@
-import type { ReactNode } from 'react';
-import type { Rosetta } from '@sylphx/rosetta/server';
-import { runWithRosetta, buildLocaleChain } from '@sylphx/rosetta/server';
-import { RosettaClientProvider } from './client';
 import fs from 'node:fs';
 import path from 'node:path';
+import type { Rosetta } from '@sylphx/rosetta/server';
+import { buildLocaleChain, runWithRosetta } from '@sylphx/rosetta/server';
+import type { ReactNode } from 'react';
+import { RosettaClientProvider } from './client';
 
 // ============================================
 // Auto-sync manifest to storage
@@ -18,7 +18,9 @@ let _synced = false;
  * - Production: Runs once per server lifecycle
  * - Development: Checks on every request (hot reload support)
  */
-async function autoSyncManifest(storage: { registerSources: (sources: Array<{ text: string; hash: string }>) => Promise<void> }): Promise<void> {
+async function autoSyncManifest(storage: {
+	registerSources: (sources: Array<{ text: string; hash: string }>) => Promise<void>;
+}): Promise<void> {
 	const isDev = process.env.NODE_ENV !== 'production';
 
 	// In production, only sync once per server lifecycle

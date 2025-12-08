@@ -43,10 +43,7 @@ const T_CALL_REGEX = /\bt\s*\(\s*(['"`])(.+?)\1(?:\s*,\s*\{[^}]*\})?\s*\)/g;
 /**
  * Extract strings from a single file's content
  */
-export function extractFromSource(
-	content: string,
-	filename: string
-): PendingSourceString[] {
+export function extractFromSource(content: string, filename: string): PendingSourceString[] {
 	const strings: PendingSourceString[] = [];
 	const seen = new Set<string>();
 
@@ -80,7 +77,14 @@ export function extractFromSource(
 export async function extract(options: ExtractOptions = {}): Promise<ExtractResult> {
 	const {
 		include = ['**/*.tsx', '**/*.ts', '**/*.jsx', '**/*.js'],
-		exclude = ['**/node_modules/**', '**/.next/**', '**/dist/**', '**/*.d.ts', '**/*.test.*', '**/*.spec.*'],
+		exclude = [
+			'**/node_modules/**',
+			'**/.next/**',
+			'**/dist/**',
+			'**/*.d.ts',
+			'**/*.test.*',
+			'**/*.spec.*',
+		],
 		root = process.cwd(),
 		verbose = false,
 	} = options;
