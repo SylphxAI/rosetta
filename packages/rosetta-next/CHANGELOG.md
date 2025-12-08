@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.10 (2025-12-08)
+
+### 🐛 Bug Fixes
+
+- **rosetta-next:** support hot reload in dev mode ([e74c5d0](https://github.com/SylphxAI/rosetta/commit/e74c5d0a818041e42fa897bde8a7cad65f05afee))
+
+### 💅 Styles
+
+- fix lint formatting ([651be20](https://github.com/SylphxAI/rosetta/commit/651be2074c18d9a127e30c77eef18ea3fbe6cdbe))
+
 ## 0.1.9 (2025-12-08)
 
 ### ✨ Features

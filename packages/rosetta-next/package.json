@@ -1,6 +1,6 @@
 {
 	"name": "@sylphx/rosetta-next",
-	"version": "0.1.9",
+	"version": "0.1.10",
 	"description": "Next.js integration for @sylphx/rosetta i18n",
 	"license": "MIT",
 	"type": "module",
@@ -24,7 +24,9 @@
 			"require": "./dist/sync.cjs"
 		}
 	},
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"scripts": {
 		"build": "NODE_ENV=production bunup src/index.tsx src/server.tsx --format esm --dts --external react --external @sylphx/rosetta && bunup src/loader.ts src/sync.ts --format esm,cjs --dts --external react --external @sylphx/rosetta --no-clean",
 		"dev": "bunup src/index.tsx src/server.tsx src/loader.ts src/sync.ts --format esm --dts --external react --external @sylphx/rosetta --watch",
