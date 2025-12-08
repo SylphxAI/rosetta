@@ -1,6 +1,6 @@
 {
 	"name": "@sylphx/rosetta",
-	"version": "0.1.4",
+	"version": "0.1.5",
 	"description": "Lightweight i18n library with LLM-powered translation generation",
 	"license": "MIT",
 	"type": "module",

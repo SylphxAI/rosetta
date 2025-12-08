@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.5 (2025-12-08)
+
+### ✨ Features
+
+- **rosetta:** add CJS exports for Node.js compatibility ([aea0045](https://github.com/SylphxAI/rosetta/commit/aea0045d5b1bc2638e209101f6dedd97a360ef04))
+
 ## 0.1.4 (2025-12-08)
 
 ### ✨ Features
