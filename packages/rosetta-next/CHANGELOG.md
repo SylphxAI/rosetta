@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.7 (2025-12-08)
+
+### ♻️ Refactoring
+
+- **rosetta-next:** separate compile-time extraction from runtime sync ([fc3cd30](https://github.com/SylphxAI/rosetta/commit/fc3cd3036344b532c91425e8675d12c72f295365))
+
 ## 0.1.6 (2025-12-08)
 
 ### 🐛 Bug Fixes
