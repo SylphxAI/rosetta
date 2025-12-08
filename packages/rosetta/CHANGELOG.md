@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1 (2025-12-08)
+
+### ✨ Features
+
+- **rosetta:** compile-time string extraction CLI ([5b58cae](https://github.com/SylphxAI/rosetta/commit/5b58cae8c90db38fb274c87b49c42b1aedaad28c))
+
 ## 0.1.0 (2025-12-07)
 
 ### ✨ Features
