@@ -68,3 +68,7 @@ export {
 } from './context';
 export type { RosettaConfig, LocaleDetector } from './i18n';
 export { Rosetta } from './i18n';
+
+// Cache adapters for different deployment environments
+export type { CacheAdapter, RedisLikeClient, InMemoryCacheOptions, ExternalCacheOptions, NextCacheOptions } from '../cache';
+export { InMemoryCache, ExternalCache, RequestScopedCache, createNextCacheLoader } from '../cache';

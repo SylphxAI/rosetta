@@ -1,3 +1,4 @@
+import type { CacheAdapter } from '../cache';
 import { hashText } from '../hash';
 import { DEFAULT_LOCALE } from '../locales';
 import type {
@@ -26,37 +27,79 @@ export interface RosettaConfig {
 	defaultLocale?: string;
 	/** Function to detect current locale */
 	localeDetector?: LocaleDetector;
+	/**
+	 * Optional cache adapter for translations
+	 *
+	 * For serverless (Vercel, Lambda): Use ExternalCache with Redis/Upstash
+	 * For traditional servers: Use InMemoryCache
+	 * For edge workers: Omit (no caching needed)
+	 *
+	 * @example Serverless with Upstash
+	 * ```ts
+	 * import { Redis } from '@upstash/redis';
+	 * import { ExternalCache } from '@sylphx/rosetta/server';
+	 *
+	 * const redis = new Redis({ url, token });
+	 * const cache = new ExternalCache(redis, { ttlSeconds: 60 });
+	 *
+	 * const rosetta = new Rosetta({ storage, cache });
+	 * ```
+	 */
+	cache?: CacheAdapter;
 }
 
 /**
- * Server-side Rosetta manager (serverless-first, no internal cache)
+ * Server-side Rosetta manager
  *
- * @example
+ * Supports optional caching for different deployment environments:
+ * - **Serverless (Vercel, Lambda):** Use ExternalCache with Redis/Upstash
+ * - **Traditional servers:** Use InMemoryCache for fast local caching
+ * - **Edge workers:** No cache needed (stateless)
+ *
+ * @example Basic setup (no cache)
+ * ```ts
  * const rosetta = new Rosetta({
  *   storage: new DrizzleStorageAdapter(db),
- *   translator: new OpenRouterAdapter({ apiKey }),
  *   defaultLocale: 'en',
- *   localeDetector: () => cookies().get('locale')?.value ?? 'en',
  * });
+ * ```
  *
- * // In layout.tsx
- * export default async function Layout({ children }) {
- *   return rosetta.init(async () => (
- *     <html><body>{children}</body></html>
- *   ));
- * }
+ * @example With Upstash Redis cache (serverless)
+ * ```ts
+ * import { Redis } from '@upstash/redis';
+ * import { ExternalCache } from '@sylphx/rosetta/server';
+ *
+ * const redis = new Redis({ url: process.env.UPSTASH_URL!, token: process.env.UPSTASH_TOKEN! });
+ * const cache = new ExternalCache(redis, { ttlSeconds: 60 });
+ *
+ * const rosetta = new Rosetta({
+ *   storage: new DrizzleStorageAdapter(db),
+ *   cache,
+ *   defaultLocale: 'en',
+ * });
+ * ```
+ *
+ * @example With in-memory cache (traditional server)
+ * ```ts
+ * import { InMemoryCache } from '@sylphx/rosetta/server';
+ *
+ * const cache = new InMemoryCache({ ttlMs: 60000 });
+ * const rosetta = new Rosetta({ storage, cache, defaultLocale: 'en' });
+ * ```
  */
 export class Rosetta {
 	private storage: StorageAdapter;
 	private translator?: TranslateAdapter;
 	private defaultLocale: string;
 	private localeDetector?: LocaleDetector;
+	private cache?: CacheAdapter;
 
 	constructor(config: RosettaConfig) {
 		this.storage = config.storage;
 		this.translator = config.translator;
 		this.defaultLocale = config.defaultLocale ?? DEFAULT_LOCALE;
 		this.localeDetector = config.localeDetector;
+		this.cache = config.cache;
 	}
 
 	/**
@@ -114,12 +157,25 @@ export class Rosetta {
 	/**
 	 * Load translations for a locale with fallback chain
 	 * Falls back through locale chain (e.g., zh-TW → zh → en)
+	 *
+	 * If a cache adapter is configured, translations are cached to reduce DB queries.
+	 * This is especially important for serverless environments where each request
+	 * may be a cold start.
+	 *
 	 * @returns Map of hash -> translated text (merged from fallback chain)
 	 */
 	async loadTranslations(locale: string): Promise<Map<string, string>> {
 		// Default locale doesn't need translations
 		if (locale === this.defaultLocale) {
 			return new Map();
+		}
+
+		// Check cache first (if configured)
+		if (this.cache) {
+			const cached = await this.cache.get(locale);
+			if (cached) {
+				return cached;
+			}
 		}
 
 		// Build fallback chain and load from each locale
@@ -139,7 +195,25 @@ export class Rosetta {
 			}
 		}
 
+		// Store in cache (if configured)
+		if (this.cache && merged.size > 0) {
+			await this.cache.set(locale, merged);
+		}
+
 		return merged;
+	}
+
+	/**
+	 * Invalidate cached translations
+	 *
+	 * Call this after updating translations to ensure fresh data is loaded.
+	 *
+	 * @param locale - Specific locale to invalidate, or undefined for all
+	 */
+	async invalidateCache(locale?: string): Promise<void> {
+		if (this.cache) {
+			await this.cache.invalidate(locale);
+		}
 	}
 
 	/**
