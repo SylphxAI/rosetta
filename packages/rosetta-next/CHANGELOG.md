@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.15 (2025-12-08)
+
+### ✨ Features
+
+- **rosetta-next:** add comprehensive locale list for language pickers ([d1ccc7f](https://github.com/SylphxAI/rosetta/commit/d1ccc7fbbcb56f6502d384d6e668d553b342551d))
+
 ## 0.1.14 (2025-12-08)
 
 ### ✨ Features
