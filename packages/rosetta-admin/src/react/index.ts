@@ -13,3 +13,14 @@ export { useBatchTranslate, type UseBatchTranslateReturn } from './hooks/useBatc
 // Clients
 export { createTRPCClient, type TRPCAdminRouter } from './clients/trpc';
 export { createRestClient, type RestClientOptions } from './clients/rest';
+
+// Re-export core types for convenience
+export type {
+  SourceEntry,
+  TranslationData,
+  LocaleStats,
+  TranslationStatsData,
+  StatusFilter,
+  ViewState,
+  AdminState,
+} from '../core/types';
