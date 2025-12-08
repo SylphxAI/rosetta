@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.9 (2025-12-08)
+
+### ✨ Features
+
+- **rosetta-next:** add automatic manifest sync on first request ([178e50b](https://github.com/SylphxAI/rosetta/commit/178e50bd034fcda81676a71028ed0581b03e2998))
+
 ## 0.1.7 (2025-12-08)
 
 ### ♻️ Refactoring
