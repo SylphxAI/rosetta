@@ -6,6 +6,86 @@
 
 A headless-first translation admin UI that can be dropped into any Next.js app.
 
+## Key Features
+
+### 1. Source Override (Full CMS Mode)
+
+Source language (e.g., English) is treated as just another translation:
+
+```
+Code:        t('Hello World')
+                   ↓
+             hash = "abc123"
+                   ↓
+┌─────────────────────────────────────────────────────────┐
+│  rosetta_sources                                         │
+│  - hash: "abc123"                                        │
+│  - text: "Hello World"  ← Always preserved (from code)  │
+└─────────────────────────────────────────────────────────┘
+                   ↓
+┌─────────────────────────────────────────────────────────┐
+│  rosetta_translations                                    │
+│  - locale: "en", text: "Hi there!"   ← Source override! │
+│  - locale: "zh-TW", text: "嗨！"     ← Based on override│
+└─────────────────────────────────────────────────────────┘
+```
+
+**Display Logic:**
+```ts
+function getText(hash: string, locale: string): string {
+  // 1. Check for translation (including source language override)
+  const translation = await getTranslation(locale, hash);
+  if (translation) return translation.text;
+
+  // 2. Fallback to code text
+  const source = await getSource(hash);
+  return source.text;
+}
+```
+
+### 2. Staleness Detection
+
+Track what source text each translation was based on:
+
+```sql
+rosetta_translations:
+  - hash
+  - locale
+  - text
+  - translated_from    ← Source text at time of translation
+  - auto_generated
+  - reviewed
+  - updated_at
+```
+
+**Detection Logic:**
+```ts
+const translation = translations[locale];
+const currentSource = getEffectiveSource(hash);  // override or code
+const isOutdated = translation.translatedFrom !== currentSource;
+```
+
+**Translation States:**
+```ts
+type TranslationStatus =
+  | 'missing'      // Not translated
+  | 'outdated'     // Translated but source changed
+  | 'unreviewed'   // AI translated, not reviewed
+  | 'reviewed'     // Human reviewed
+  | 'current';     // Up to date (reviewed + not outdated)
+```
+
+### 3. Enhanced Stats
+
+```ts
+interface LocaleStats {
+  translated: number;
+  reviewed: number;
+  outdated: number;    // Translations where source changed
+  total: number;
+}
+```
+
 ## Architecture
 
 ### Core Insight

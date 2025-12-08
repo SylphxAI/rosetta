@@ -169,14 +169,12 @@ export class Rosetta {
 	 * This is especially important for serverless environments where each request
 	 * may be a cold start.
 	 *
+	 * **Source Override:** Even for the default locale, translations are loaded.
+	 * This enables CMS-like behavior where source text can be overridden in the DB.
+	 *
 	 * @returns Map of hash -> translated text (merged from fallback chain)
 	 */
 	async loadTranslations(locale: string): Promise<Map<string, string>> {
-		// Default locale doesn't need translations
-		if (locale === this.defaultLocale) {
-			return new Map();
-		}
-
 		// Check cache first (if configured)
 		if (this.cache) {
 			const cached = await this.cache.get(locale);
@@ -191,11 +189,9 @@ export class Rosetta {
 
 		// Load from fallback chain in reverse order (default first, then more specific)
 		// This way, more specific locales override less specific ones
+		// NOTE: We now load translations for ALL locales including default (source override)
 		for (let i = chain.length - 1; i >= 0; i--) {
 			const chainLocale = chain[i]!;
-			// Skip default locale (no translations needed)
-			if (chainLocale === this.defaultLocale) continue;
-
 			const translations = await this.storage.getTranslations(chainLocale);
 			for (const [hash, text] of translations) {
 				merged.set(hash, text);
@@ -226,23 +222,21 @@ export class Rosetta {
 	/**
 	 * Load translations for specific hashes only (fine-grained loading)
 	 * Falls back through locale chain (e.g., zh-TW → zh → en)
+	 *
+	 * **Source Override:** Even for the default locale, translations are loaded.
+	 * This enables CMS-like behavior where source text can be overridden in the DB.
+	 *
 	 * @returns Map of hash -> translated text (merged from fallback chain)
 	 */
 	async loadTranslationsByHashes(locale: string, hashes: string[]): Promise<Map<string, string>> {
-		// Default locale doesn't need translations
-		if (locale === this.defaultLocale) {
-			return new Map();
-		}
-
 		// Build fallback chain
 		const chain = buildLocaleChain(locale, this.defaultLocale);
 		const merged = new Map<string, string>();
 
 		// Load from fallback chain in reverse order (default first, then more specific)
+		// NOTE: We now load translations for ALL locales including default (source override)
 		for (let i = chain.length - 1; i >= 0; i--) {
 			const chainLocale = chain[i]!;
-			// Skip default locale (no translations needed)
-			if (chainLocale === this.defaultLocale) continue;
 
 			// Use fine-grained loading if available
 			const translations = this.storage.getTranslationsByHashes
