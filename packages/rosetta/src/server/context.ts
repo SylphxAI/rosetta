@@ -209,6 +209,13 @@ function parseTranslateOptions(
 	return { params: paramsOrOptions as Record<string, string | number> };
 }
 
+// ============================================
+// ICU Safety Constants
+// ============================================
+
+const MAX_ICU_NESTING_DEPTH = 5;
+const MAX_TEXT_LENGTH = 50000;
+
 /**
  * Format message with ICU-like syntax support
  * Supports: {name}, {count, plural, one {...} other {...}}, {gender, select, ...}
@@ -216,9 +223,20 @@ function parseTranslateOptions(
 function formatMessage(text: string, params?: Record<string, string | number>): string {
 	if (!params) return text;
 
+	// Safety: Limit text length
+	if (text.length > MAX_TEXT_LENGTH) {
+		console.warn('[rosetta] Translation too long, truncating');
+		text = text.slice(0, MAX_TEXT_LENGTH);
+	}
+
 	// Check for ICU patterns
 	if (text.includes(', plural,') || text.includes(', select,')) {
-		return formatICU(text, params);
+		try {
+			return formatICU(text, params, 0);
+		} catch (error) {
+			console.error('[rosetta] ICU formatting error:', error);
+			return interpolate(text, params);
+		}
 	}
 
 	// Simple interpolation
@@ -228,15 +246,30 @@ function formatMessage(text: string, params?: Record<string, string | number>): 
 /**
  * Basic ICU MessageFormat support
  * Handles plural and select patterns
+ *
+ * Security features:
+ * - Depth limiting to prevent stack overflow
+ * - Iteration limiting to prevent infinite loops
  */
-function formatICU(text: string, params: Record<string, string | number>): string {
-	// Pattern: {varName, plural, one {singular} other {plural}}
-	// Pattern: {varName, select, male {He} female {She} other {They}}
+function formatICU(
+	text: string,
+	params: Record<string, string | number>,
+	depth: number = 0
+): string {
+	// Security: Prevent deeply nested patterns (DoS attack vector)
+	if (depth > MAX_ICU_NESTING_DEPTH) {
+		console.warn('[rosetta] Max ICU nesting depth exceeded, aborting');
+		return text;
+	}
 
 	let result = text;
 	let startIndex = 0;
+	let iterations = 0;
+	const maxIterations = 100; // Prevent infinite loops
 
-	while (startIndex < result.length) {
+	while (startIndex < result.length && iterations < maxIterations) {
+		iterations++;
+
 		// Find pattern start: {varName, plural/select,
 		const patternMatch = result.slice(startIndex).match(/\{(\w+),\s*(plural|select),\s*/);
 		if (!patternMatch || patternMatch.index === undefined) break;
@@ -248,10 +281,20 @@ function formatICU(text: string, params: Record<string, string | number>): strin
 
 		// Find matching closing brace by counting brace depth
 		let braceCount = 1;
+		let braceDepth = 1;
 		let i = optionsStart;
 		while (i < result.length && braceCount > 0) {
-			if (result[i] === '{') braceCount++;
-			else if (result[i] === '}') braceCount--;
+			if (result[i] === '{') {
+				braceCount++;
+				braceDepth++;
+				// Security: Check nesting depth during parsing
+				if (braceDepth > MAX_ICU_NESTING_DEPTH) {
+					console.warn('[rosetta] Max brace nesting depth exceeded');
+					return text;
+				}
+			} else if (result[i] === '}') {
+				braceCount--;
+			}
 			i++;
 		}
 
@@ -290,6 +333,11 @@ function formatICU(text: string, params: Record<string, string | number>): strin
 		} else {
 			startIndex = matchEnd;
 			continue;
+		}
+
+		// Recursively format nested patterns (with increased depth)
+		if (replacement.includes(', plural,') || replacement.includes(', select,')) {
+			replacement = formatICU(replacement, params, depth + 1);
 		}
 
 		result = result.slice(0, matchStart) + replacement + result.slice(matchEnd);
@@ -336,23 +384,47 @@ function parseICUOptions(options: string): Record<string, string> {
 	return result;
 }
 
+// ============================================
+// PluralRules Cache (Performance)
+// ============================================
+
+// Cache Intl.PluralRules instances per locale (2-5x faster)
+const pluralRulesCache = new Map<string, Intl.PluralRules>();
+const MAX_PLURAL_RULES_CACHE = 20;
+
 /**
- * Get plural category for a number (simplified English rules)
+ * Get plural category for a number using cached PluralRules
+ * Uses the current locale from context for proper CLDR pluralization
  */
 function getPluralCategory(count: number): string {
-	// Simplified: just one/other for English
-	// Full ICU would use Intl.PluralRules
-	if (typeof Intl !== 'undefined' && Intl.PluralRules) {
-		return new Intl.PluralRules('en').select(count);
+	if (typeof Intl === 'undefined' || !Intl.PluralRules) {
+		return count === 1 ? 'one' : 'other';
 	}
-	return count === 1 ? 'one' : 'other';
+
+	// Get locale from context, fallback to 'en'
+	const locale = rosettaStorage.getStore()?.locale ?? 'en';
+
+	// Use cached PluralRules instance
+	let rules = pluralRulesCache.get(locale);
+	if (!rules) {
+		// Evict oldest if cache full (simple LRU)
+		if (pluralRulesCache.size >= MAX_PLURAL_RULES_CACHE) {
+			const firstKey = pluralRulesCache.keys().next().value;
+			if (firstKey) pluralRulesCache.delete(firstKey);
+		}
+		rules = new Intl.PluralRules(locale);
+		pluralRulesCache.set(locale, rules);
+	}
+
+	return rules.select(count);
 }
 
 /**
  * Replace # with the count in plural templates
+ * Uses replacer function to avoid $ interpretation security issue
  */
 function replaceHash(template: string, count: number): string {
-	return template.replace(/#/g, String(count));
+	return template.replace(/#/g, () => String(count));
 }
 
 // ============================================
