@@ -2,6 +2,57 @@ import type { ReactNode } from 'react';
 import type { Rosetta } from '@sylphx/rosetta/server';
 import { runWithRosetta, buildLocaleChain } from '@sylphx/rosetta/server';
 import { RosettaClientProvider } from './client';
+import fs from 'node:fs';
+import path from 'node:path';
+
+// ============================================
+// Auto-sync manifest to storage
+// ============================================
+
+const MANIFEST_PATH = path.join(process.cwd(), '.rosetta', 'manifest.json');
+let _syncPromise: Promise<void> | null = null;
+let _synced = false;
+
+/**
+ * Auto-sync extracted strings from manifest to storage
+ * Runs once per server lifecycle, on first RosettaProvider render
+ */
+async function autoSyncManifest(storage: { registerSources: (sources: Array<{ text: string; hash: string }>) => Promise<void> }): Promise<void> {
+	// Already synced this server lifecycle
+	if (_synced) return;
+
+	// Already syncing (concurrent requests)
+	if (_syncPromise) {
+		await _syncPromise;
+		return;
+	}
+
+	// Check if manifest exists
+	if (!fs.existsSync(MANIFEST_PATH)) {
+		_synced = true;
+		return;
+	}
+
+	// Sync manifest to storage
+	_syncPromise = (async () => {
+		try {
+			const manifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf-8'));
+			if (Array.isArray(manifest) && manifest.length > 0) {
+				await storage.registerSources(manifest);
+				// Delete manifest after successful sync
+				fs.unlinkSync(MANIFEST_PATH);
+				console.log(`[rosetta] ✓ Auto-synced ${manifest.length} strings to storage`);
+			}
+		} catch (error) {
+			console.error('[rosetta] Auto-sync failed:', error);
+		} finally {
+			_synced = true;
+			_syncPromise = null;
+		}
+	})();
+
+	await _syncPromise;
+}
 
 // ============================================
 // Types
@@ -95,6 +146,9 @@ export async function RosettaProvider({
 	children,
 	hashes,
 }: RosettaProviderProps): Promise<React.ReactElement> {
+	// Auto-sync manifest to storage on first render (once per server lifecycle)
+	await autoSyncManifest(rosetta.getStorage());
+
 	// Load translations - fine-grained if hashes provided, otherwise all
 	// Translations are already merged from fallback chain (zh-TW → zh → en)
 	const translations = hashes
