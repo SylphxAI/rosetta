@@ -88,15 +88,13 @@ export function runWithRosetta<T>(options: RunWithRosettaOptions, fn: () => T): 
 	// Build locale chain if not provided
 	const localeChain = options.localeChain ?? buildLocaleChain(options.locale, options.defaultLocale);
 
-	// Create full context with request-scoped collection state
+	// Create context
 	const fullContext: RosettaContext = {
 		locale: options.locale,
 		defaultLocale: options.defaultLocale,
 		localeChain,
 		translations: options.translations,
 		storage: options.storage,
-		collectedHashes: new Set<string>(),
-		pendingStrings: [],
 		initialized: true,
 	};
 
@@ -104,61 +102,21 @@ export function runWithRosetta<T>(options: RunWithRosettaOptions, fn: () => T): 
 }
 
 // ============================================
-// String Collection (Request-scoped, Production-safe)
+// Legacy exports (no-op, kept for compatibility)
 // ============================================
 
 /**
- * Queue a string for collection (sync, non-blocking)
- * Uses request-scoped state to prevent race conditions
- */
-function queueForCollection(text: string, hash: string, context?: string): void {
-	const ctx = getRosettaContext();
-	if (!ctx?.initialized || !ctx.storage) return;
-
-	// Check request-scoped deduplication set
-	if (ctx.collectedHashes.has(hash)) return;
-	ctx.collectedHashes.add(hash);
-	ctx.pendingStrings.push({ text, hash, context });
-}
-
-/**
- * Flush collected strings to storage
- * Call at end of request or use scheduleFlush for automatic handling
+ * @deprecated Use `rosetta extract` CLI for compile-time string extraction
  */
 export async function flushCollectedStrings(): Promise<void> {
-	const ctx = getRosettaContext();
-	if (!ctx?.initialized || !ctx.storage || ctx.pendingStrings.length === 0) return;
-
-	// Copy and clear in one operation to avoid race conditions
-	const items = [...ctx.pendingStrings];
-	ctx.pendingStrings.length = 0;
-	// Don't clear collectedHashes - keep for deduplication within request
-
-	try {
-		await ctx.storage.registerSources(items);
-	} catch (error) {
-		console.error('[rosetta] Failed to flush collected strings:', error);
-		// Re-add items for retry on next flush
-		ctx.pendingStrings.push(...items);
-	}
+	// No-op: Use compile-time extraction instead
 }
 
 /**
- * Schedule flush to run after current execution
- * Safe to call multiple times - will only flush once
+ * @deprecated Use `rosetta extract` CLI for compile-time string extraction
  */
-let flushScheduled = false;
 export function scheduleFlush(): void {
-	if (flushScheduled) return;
-	flushScheduled = true;
-
-	// Use setImmediate if available (Node.js), otherwise setTimeout
-	const schedule = typeof setImmediate !== 'undefined' ? setImmediate : (fn: () => void) => setTimeout(fn, 0);
-
-	schedule(async () => {
-		flushScheduled = false;
-		await flushCollectedStrings();
-	});
+	// No-op: Use compile-time extraction instead
 }
 
 // ============================================
@@ -193,9 +151,6 @@ export function t(
 	// Parse options
 	const { context, params } = parseTranslateOptions(paramsOrOptions);
 	const hash = hashText(text, context);
-
-	// Queue for collection (production-safe, non-blocking)
-	queueForCollection(text, hash, context);
 
 	// Check if called outside context
 	if (!store?.initialized) {

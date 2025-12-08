@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import type { Rosetta } from '@sylphx/rosetta/server';
-import { runWithRosetta, scheduleFlush, buildLocaleChain } from '@sylphx/rosetta/server';
+import { runWithRosetta, buildLocaleChain } from '@sylphx/rosetta/server';
 import { RosettaClientProvider } from './client';
 
 // ============================================
@@ -113,20 +113,14 @@ export async function RosettaProvider({
 			translations,
 			storage: rosetta.getStorage(),
 		},
-		() => {
-			// Schedule flush at end of request (non-blocking)
-			// Uses setImmediate/setTimeout to defer without blocking render
-			scheduleFlush();
-
-			return (
-				<RosettaClientProvider
-					locale={locale}
-					defaultLocale={defaultLocale}
-					translations={Object.fromEntries(translations)}
-				>
-					{children}
-				</RosettaClientProvider>
-			);
-		}
+		() => (
+			<RosettaClientProvider
+				locale={locale}
+				defaultLocale={defaultLocale}
+				translations={Object.fromEntries(translations)}
+			>
+				{children}
+			</RosettaClientProvider>
+		)
 	);
 }

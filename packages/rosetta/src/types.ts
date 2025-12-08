@@ -246,12 +246,8 @@ export interface RosettaContext {
 	localeChain: string[];
 	/** hash -> translated text (merged from fallback chain) */
 	translations: Map<string, string>;
-	/** Storage adapter for flushing collected strings */
+	/** Storage adapter (for admin operations) */
 	storage?: StorageAdapter;
-	/** Request-scoped: hashes collected this request (prevents duplicates) */
-	collectedHashes: Set<string>;
-	/** Request-scoped: pending strings to flush at end of request */
-	pendingStrings: PendingSourceString[];
 	/** Whether context is fully initialized */
 	initialized: boolean;
 }

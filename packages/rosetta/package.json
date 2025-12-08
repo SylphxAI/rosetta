@@ -16,13 +16,20 @@
 		"./adapters": {
 			"types": "./dist/adapters/index.d.ts",
 			"import": "./dist/adapters/index.js"
+		},
+		"./cli": {
+			"types": "./dist/cli/index.d.ts",
+			"import": "./dist/cli/index.js"
 		}
+	},
+	"bin": {
+		"rosetta": "./dist/cli/index.js"
 	},
 	"files": [
 		"dist"
 	],
 	"scripts": {
-		"build": "bunup src/index.ts src/server/index.ts src/adapters/index.ts --dts",
+		"build": "bunup src/index.ts src/server/index.ts src/adapters/index.ts src/cli/index.ts --dts",
 		"dev": "bunup src/index.ts src/server/index.ts src/adapters/index.ts --dts --watch",
 		"test": "bun test",
 		"typecheck": "tsc --noEmit",
