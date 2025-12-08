@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.6 (2025-12-08)
+
+### 🐛 Bug Fixes
+
+- **rosetta:** remove duplicate exports from bunup build output ([a189744](https://github.com/SylphxAI/rosetta/commit/a18974410b5196164668de646d6b3c0579730790))
+
 ## 0.1.5 (2025-12-08)
 
 ### ✨ Features
