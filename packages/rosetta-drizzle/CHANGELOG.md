@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.9 (2025-12-08)
+
+### ✨ Features
+
+- **rosetta:** add source override and staleness detection ([540c04d](https://github.com/SylphxAI/rosetta/commit/540c04daedebe3b730b35ccecd4cb43dc518450f))
+
 ## 0.1.8 (2025-12-08)
 
 ### 🐛 Bug Fixes
