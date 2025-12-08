@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.17 (2025-12-08)
+
+### 🐛 Bug Fixes
+
+- **rosetta-next:** fix duplicate export in locales.js build ([32d5ec3](https://github.com/SylphxAI/rosetta/commit/32d5ec3ccbeeec4966e9ee24a231c37e268af997))
+
 ## 0.1.16 (2025-12-08)
 
 ### ✨ Features
