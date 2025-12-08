@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.14 (2025-12-08)
+
+### ✨ Features
+
+- **rosetta-next:** add locale utilities for language picker ([2db5f79](https://github.com/SylphxAI/rosetta/commit/2db5f7989b21993e47ba6213d0b6e5adba3fe870))
+
 ## 0.1.13 (2025-12-08)
 
 ### 🐛 Bug Fixes
