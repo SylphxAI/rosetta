@@ -149,4 +149,6 @@ main().catch((error) => {
 	process.exit(1);
 });
 
+export { extract, formatResult } from './extract';
+export type { ExtractOptions, ExtractResult } from './extract';
 export type { CLIOptions };

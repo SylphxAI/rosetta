@@ -12,14 +12,22 @@
 		"./server": {
 			"types": "./dist/server.d.ts",
 			"import": "./dist/server.js"
+		},
+		"./loader": {
+			"types": "./dist/loader.d.ts",
+			"import": "./dist/loader.js"
+		},
+		"./sync": {
+			"types": "./dist/sync.d.ts",
+			"import": "./dist/sync.js"
 		}
 	},
 	"files": [
 		"dist"
 	],
 	"scripts": {
-		"build": "NODE_ENV=production bunup src/index.tsx src/server.tsx --dts --external react --external @sylphx/rosetta",
-		"dev": "bunup src/index.tsx src/server.tsx --dts --external react --external @sylphx/rosetta --watch",
+		"build": "NODE_ENV=production bunup src/index.tsx src/server.tsx src/loader.ts src/sync.ts --dts --external react --external @sylphx/rosetta",
+		"dev": "bunup src/index.tsx src/server.tsx src/loader.ts src/sync.ts --dts --external react --external @sylphx/rosetta --watch",
 		"typecheck": "tsc --noEmit",
 		"clean": "rm -rf dist"
 	},
