@@ -15,7 +15,7 @@
     },
     "packages/rosetta": {
       "name": "@sylphx/rosetta",
-      "version": "0.1.6",
+      "version": "0.1.7",
       "bin": {
         "rosetta": "./dist/cli/index.js",
       },
@@ -58,7 +58,7 @@
     },
     "packages/rosetta-drizzle": {
       "name": "@sylphx/rosetta-drizzle",
-      "version": "0.1.8",
+      "version": "0.1.9",
       "devDependencies": {
         "@types/better-sqlite3": "^7.6.13",
         "@types/bun": "^1.1.14",

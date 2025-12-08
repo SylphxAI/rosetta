@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1 (2025-12-08)
+
+### 🐛 Bug Fixes
+
+- **rosetta-admin:** export SourceEntry type from react module ([e3ce4aa](https://github.com/SylphxAI/rosetta/commit/e3ce4aa8a392e9f35ff966aa7d2ccf2f0e84dcc2))
+
 ## 0.1.0 (2025-12-08)
 
 ### ✨ Features
