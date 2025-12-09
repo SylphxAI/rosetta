@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1
+
+### Patch Changes
+
+- 540cf76: Fix JSX runtime import - configure bunup to use automatic JSX runtime with proper import source
+
 ## 1.0.0
 
 ### Minor Changes
