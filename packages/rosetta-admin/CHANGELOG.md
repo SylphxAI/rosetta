@@ -1,11 +1,5 @@
 # Changelog
 
-## 0.1.6 (2025-12-09)
-
-### 🐛 Bug Fixes
-
-- **rosetta-admin:** fix stale closure in streaming callbacks - progress now persists when navigating between views
-
 ## 0.1.5 (2025-12-09)
 
 ### ✨ Features
