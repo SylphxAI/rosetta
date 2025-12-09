@@ -77,7 +77,7 @@
     },
     "packages/rosetta-next": {
       "name": "@sylphx/rosetta-next",
-      "version": "0.1.21",
+      "version": "0.1.22",
       "devDependencies": {
         "@types/node": "^22",
         "@types/react": "^19",

@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.0 (2025-12-09)
+
+### ✨ Features
+
+- 💥 manifest-based architecture - sources as static files ([430dc2b](https://github.com/SylphxAI/rosetta/commit/430dc2bb2b06812a217bae968957bb2a9ba1a563))
+
+### 💥 Breaking Changes
+
+- manifest-based architecture - sources as static files ([430dc2b](https://github.com/SylphxAI/rosetta/commit/430dc2bb2b06812a217bae968957bb2a9ba1a563))
+
 ## 0.1.10 (2025-12-09)
 
 ### ✨ Features
