@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.3 (2025-12-09)
+
+### 🐛 Bug Fixes
+
+- **rosetta-next:** use production JSX runtime (jsx instead of jsxDEV) ([1f948f1](https://github.com/SylphxAI/rosetta/commit/1f948f10b5fec3ea2fe73ae3fa2b615c00adee9a))
+
 ## 1.0.1
 
 ### Patch Changes
