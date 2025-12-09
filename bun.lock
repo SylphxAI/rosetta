@@ -33,7 +33,7 @@
     },
     "packages/rosetta-admin": {
       "name": "@sylphx/rosetta-admin",
-      "version": "0.1.5",
+      "version": "0.1.6",
       "devDependencies": {
         "@biomejs/biome": "^2.3.8",
         "@sylphx/biome-config": "^0.4.1",

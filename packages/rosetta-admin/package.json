@@ -1,6 +1,6 @@
 {
 	"name": "@sylphx/rosetta-admin",
-	"version": "0.1.6",
+	"version": "0.1.7",
 	"description": "Headless translation admin hooks for @sylphx/rosetta",
 	"license": "MIT",
 	"type": "module",
