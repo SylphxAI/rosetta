@@ -143,8 +143,47 @@ export function createRestHandlers(config: RestHandlersConfig): RestHandlers {
 					return Response.json({ error: 'Valid non-English locale is required' }, { status: 400 });
 				}
 
-				const result = await service.batchTranslate({ locale, hashes });
+				// Check if client accepts SSE
+				const acceptHeader = request.headers.get('Accept') || '';
+				const wantsStream = acceptHeader.includes('text/event-stream');
 
+				if (wantsStream) {
+					// Return SSE stream
+					const stream = new ReadableStream({
+						async start(controller) {
+							const encoder = new TextEncoder();
+
+							function sendEvent(data: unknown) {
+								const message = `data: ${JSON.stringify(data)}\n\n`;
+								controller.enqueue(encoder.encode(message));
+							}
+
+							try {
+								for await (const event of service.batchTranslateStream({ locale, hashes })) {
+									sendEvent(event);
+								}
+							} catch (err) {
+								sendEvent({
+									type: 'error',
+									message: err instanceof Error ? err.message : 'Stream failed',
+								});
+							} finally {
+								controller.close();
+							}
+						},
+					});
+
+					return new Response(stream, {
+						headers: {
+							'Content-Type': 'text/event-stream',
+							'Cache-Control': 'no-cache',
+							Connection: 'keep-alive',
+						},
+					});
+				}
+
+				// Fallback: non-streaming response
+				const result = await service.batchTranslate({ locale, hashes });
 				return Response.json(result);
 			} catch (error) {
 				console.error('Batch translation failed:', error);

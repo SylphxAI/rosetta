@@ -21,8 +21,10 @@
 
 import type {
 	AdminAPIClient,
+	BatchStreamEvent,
 	BatchTranslateRequest,
 	BatchTranslateResponse,
+	BatchTranslateStreamCallbacks,
 	FetchTranslationsResponse,
 	MarkAsReviewedRequest,
 	SaveTranslationRequest,
@@ -83,6 +85,74 @@ export function createRestClient(options: RestClientOptions): AdminAPIClient {
 				method: 'POST',
 				body: JSON.stringify(data),
 			});
+		},
+
+		async batchTranslateStream(
+			data: BatchTranslateRequest,
+			callbacks: BatchTranslateStreamCallbacks
+		): Promise<void> {
+			const url = `${baseUrl}/batch`;
+			const response = await customFetch(url, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Accept: 'text/event-stream',
+				},
+				body: JSON.stringify(data),
+			});
+
+			if (!response.ok) {
+				const error = await response.json().catch(() => ({ error: 'Request failed' }));
+				callbacks.onError?.(error.error || 'Request failed');
+				return;
+			}
+
+			const reader = response.body?.getReader();
+			if (!reader) {
+				callbacks.onError?.('No response body');
+				return;
+			}
+
+			const decoder = new TextDecoder();
+			let buffer = '';
+
+			try {
+				while (true) {
+					const { done, value } = await reader.read();
+					if (done) break;
+
+					buffer += decoder.decode(value, { stream: true });
+					const lines = buffer.split('\n');
+					buffer = lines.pop() || '';
+
+					for (const line of lines) {
+						if (line.startsWith('data: ')) {
+							try {
+								const event: BatchStreamEvent = JSON.parse(line.slice(6));
+
+								switch (event.type) {
+									case 'progress':
+										callbacks.onProgress?.(event.current, event.total);
+										break;
+									case 'translation':
+										callbacks.onTranslation?.(event.sourceHash, event.translatedText);
+										break;
+									case 'complete':
+										callbacks.onComplete?.(event.translated, event.total);
+										break;
+									case 'error':
+										callbacks.onError?.(event.message);
+										break;
+								}
+							} catch {
+								// Ignore parse errors
+							}
+						}
+					}
+				}
+			} finally {
+				reader.releaseLock();
+			}
 		},
 
 		async addLocale(locale: string): Promise<void> {

@@ -150,6 +150,55 @@ export interface BatchTranslateResponse {
 }
 
 // ============================================
+// SSE Streaming Types
+// ============================================
+
+/**
+ * SSE event: Progress update
+ */
+export interface BatchProgressEvent {
+	type: 'progress';
+	current: number;
+	total: number;
+}
+
+/**
+ * SSE event: Translation completed for a single item
+ */
+export interface BatchTranslationEvent {
+	type: 'translation';
+	sourceHash: string;
+	translatedText: string;
+}
+
+/**
+ * SSE event: Batch completed
+ */
+export interface BatchCompleteEvent {
+	type: 'complete';
+	success: boolean;
+	translated: number;
+	total: number;
+}
+
+/**
+ * SSE event: Error occurred
+ */
+export interface BatchErrorEvent {
+	type: 'error';
+	message: string;
+}
+
+/**
+ * All SSE event types
+ */
+export type BatchStreamEvent =
+	| BatchProgressEvent
+	| BatchTranslationEvent
+	| BatchCompleteEvent
+	| BatchErrorEvent;
+
+// ============================================
 // Store State Types
 // ============================================
 
@@ -222,6 +271,20 @@ export interface TranslateFunction {
 }
 
 /**
+ * Callback for streaming batch translation events
+ */
+export interface BatchTranslateStreamCallbacks {
+	/** Called on progress updates */
+	onProgress?: (current: number, total: number) => void;
+	/** Called when a single translation completes */
+	onTranslation?: (sourceHash: string, translatedText: string) => void;
+	/** Called on error */
+	onError?: (message: string) => void;
+	/** Called when complete */
+	onComplete?: (translated: number, total: number) => void;
+}
+
+/**
  * API client interface - implement for REST, tRPC, GraphQL, etc.
  */
 export interface AdminAPIClient {
@@ -234,8 +297,17 @@ export interface AdminAPIClient {
 	/** Mark a translation as reviewed */
 	markAsReviewed(request: MarkAsReviewedRequest): Promise<void>;
 
-	/** Batch translate using AI */
+	/** Batch translate using AI (non-streaming) */
 	batchTranslate(request: BatchTranslateRequest): Promise<BatchTranslateResponse>;
+
+	/**
+	 * Batch translate with streaming progress (optional)
+	 * If not implemented, falls back to batchTranslate
+	 */
+	batchTranslateStream?(
+		request: BatchTranslateRequest,
+		callbacks: BatchTranslateStreamCallbacks
+	): Promise<void>;
 
 	/** Add a new locale */
 	addLocale?(locale: string): Promise<void>;

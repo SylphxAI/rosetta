@@ -256,6 +256,7 @@ export function createAdminStore(client: AdminAPIClient) {
 	/**
 	 * Batch translate using AI
 	 * Server-first: only sends locale (and optional hashes), server finds untranslated strings
+	 * Uses streaming when available for real-time progress
 	 */
 	async function batchTranslate(locale?: string, hashes?: string[]): Promise<void> {
 		const targetLocale = locale || state.activeLocale;
@@ -280,40 +281,91 @@ export function createAdminStore(client: AdminAPIClient) {
 			error: null,
 		});
 
+		const request = {
+			locale: targetLocale,
+			hashes: hashes, // Only send if specific hashes requested
+		};
+
 		try {
-			const result = await client.batchTranslate({
-				locale: targetLocale,
-				hashes: hashes, // Only send if specific hashes requested
-			});
+			// Use streaming if available
+			if (client.batchTranslateStream) {
+				await client.batchTranslateStream(request, {
+					onProgress: (current, total) => {
+						setState({
+							batchProgress: { current, total },
+						});
+					},
+					onTranslation: (sourceHash, translatedText) => {
+						// Update source with new translation
+						setState({
+							sources: state.sources.map((s) => {
+								if (s.sourceHash !== sourceHash) return s;
+								return {
+									...s,
+									translations: {
+										...s.translations,
+										[targetLocale]: {
+											text: translatedText,
+											auto: true,
+											reviewed: false,
+											translatedFrom: s.effectiveSource,
+											outdated: false,
+										} satisfies TranslationData,
+									},
+								};
+							}),
+						});
+					},
+					onError: (message) => {
+						setState({
+							isBatchTranslating: false,
+							error: message,
+						});
+					},
+					onComplete: async (translated, total) => {
+						setState({
+							isBatchTranslating: false,
+							batchProgress: { current: translated, total },
+						});
+						// Refresh data to get updated stats
+						await fetchData();
+					},
+				});
+			} else {
+				// Fallback: non-streaming
+				const result = await client.batchTranslate(request);
 
-			// Update sources with new translations
-			const translationMap = new Map(result.translations.map((t) => [t.sourceHash, t.translatedText]));
+				// Update sources with new translations
+				const translationMap = new Map(
+					result.translations.map((t) => [t.sourceHash, t.translatedText])
+				);
 
-			setState({
-				isBatchTranslating: false,
-				batchProgress: { current: result.translated, total: result.total },
-				sources: state.sources.map((s) => {
-					const translatedText = translationMap.get(s.sourceHash);
-					if (!translatedText) return s;
+				setState({
+					isBatchTranslating: false,
+					batchProgress: { current: result.translated, total: result.total },
+					sources: state.sources.map((s) => {
+						const translatedText = translationMap.get(s.sourceHash);
+						if (!translatedText) return s;
 
-					return {
-						...s,
-						translations: {
-							...s.translations,
-							[targetLocale]: {
-								text: translatedText,
-								auto: true,
-								reviewed: false,
-								translatedFrom: s.effectiveSource,
-								outdated: false,
-							} satisfies TranslationData,
-						},
-					};
-				}),
-			});
+						return {
+							...s,
+							translations: {
+								...s.translations,
+								[targetLocale]: {
+									text: translatedText,
+									auto: true,
+									reviewed: false,
+									translatedFrom: s.effectiveSource,
+									outdated: false,
+								} satisfies TranslationData,
+							},
+						};
+					}),
+				});
 
-			// Refresh data to get updated stats
-			await fetchData();
+				// Refresh data to get updated stats
+				await fetchData();
+			}
 		} catch (err) {
 			setState({
 				isBatchTranslating: false,
