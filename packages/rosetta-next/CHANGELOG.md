@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.22 (2025-12-09)
+
+### ✨ Features
+
+- **rosetta-next:** bulletproof auto-sync with timeout + instrumentation.ts support ([ff9ee75](https://github.com/SylphxAI/rosetta/commit/ff9ee75c4f2abba622fbaa72c907a92946d91eec))
+
 ## 0.1.21 (2025-12-09)
 
 ### ✨ Features
