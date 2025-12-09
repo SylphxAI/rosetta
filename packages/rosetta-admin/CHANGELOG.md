@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.6 (2025-12-09)
+
+### 🐛 Bug Fixes
+
+- **rosetta-admin:** fix stale closure in streaming callbacks ([6098d41](https://github.com/SylphxAI/rosetta/commit/6098d41cf447670e2c82c3aa3ea8eabc88751213))
+- **rosetta-admin:** fix stale closure in streaming callbacks ([4edf3f7](https://github.com/SylphxAI/rosetta/commit/4edf3f706ddfc8b7edcfcc16a702c76c88b87030))
+
 ## 0.1.5 (2025-12-09)
 
 ### ✨ Features
