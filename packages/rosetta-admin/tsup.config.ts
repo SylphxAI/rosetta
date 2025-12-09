@@ -10,7 +10,7 @@ export default defineConfig({
 	format: ['esm'],
 	dts: true,
 	clean: true,
-	external: ['react', '@sylphx/rosetta', '@trpc/server'],
+	external: ['react', '@sylphx/rosetta', '@trpc/server', 'zod'],
 	splitting: false,
 	treeshake: true,
 });

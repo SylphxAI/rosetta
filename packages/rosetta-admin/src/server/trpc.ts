@@ -5,13 +5,18 @@
  * ```ts
  * // server/trpc/routers/admin.ts
  * import { createAdminRouter } from '@sylphx/rosetta-admin/server/trpc';
+ * import { createAiSdkTranslator } from '@sylphx/rosetta-translator-ai-sdk';
+ * import { createOpenRouter } from '@openrouter/ai-sdk-provider';
  * import { storage } from '@/lib/rosetta';
- * import { createOpenRouterTranslator } from '@sylphx/rosetta-admin/ai';
+ *
+ * const openrouter = createOpenRouter({
+ *   apiKey: process.env.OPENROUTER_API_KEY!,
+ * });
  *
  * export const adminRouter = createAdminRouter({
  *   storage,
- *   translator: createOpenRouterTranslator({
- *     apiKey: process.env.OPENROUTER_API_KEY!,
+ *   translator: createAiSdkTranslator({
+ *     model: openrouter(process.env.LLM_MODEL!),
  *   }),
  * });
  *

@@ -32,7 +32,7 @@
     },
     "packages/rosetta-admin": {
       "name": "@sylphx/rosetta-admin",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "devDependencies": {
         "@biomejs/biome": "^2.3.8",
         "@sylphx/biome-config": "^0.4.1",
@@ -43,9 +43,11 @@
         "react": "^19.0.0",
         "tsup": "^8.5.1",
         "typescript": "^5",
+        "zod": "^3.24.0",
       },
       "optionalDependencies": {
         "@trpc/server": ">=11.0.0",
+        "zod": ">=3.0.0",
       },
       "peerDependencies": {
         "@sylphx/rosetta": ">=0.1.0",
