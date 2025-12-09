@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.4 (2025-12-09)
+
+### ♻️ Refactoring
+
+- **rosetta-admin:** server-first batch translate API ([2d57a6a](https://github.com/SylphxAI/rosetta/commit/2d57a6a899550d88b674871f80ef2c185ee5ef70))
+
 ## 0.1.3 (2025-12-09)
 
 ### ✨ Features
