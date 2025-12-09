@@ -5,14 +5,16 @@
  */
 
 import { useCallback, useMemo } from 'react';
-import type { SourceEntry } from '../../core/types';
+import type { LocaleBatchProgress, SourceEntry } from '../../core/types';
 import { useAdminState, useAdminStore } from '../context';
 
 export interface UseBatchTranslateReturn {
-	/** Is batch translation running */
+	/** Is batch translation running for the active locale */
 	isRunning: boolean;
-	/** Progress */
-	progress: { current: number; total: number };
+	/** Progress for the active locale (null if not translating) */
+	progress: LocaleBatchProgress | null;
+	/** Per-locale batch progress (for multi-locale progress display) */
+	allProgress: Record<string, LocaleBatchProgress | null>;
 	/** Error message */
 	error: string | null;
 
@@ -20,6 +22,11 @@ export interface UseBatchTranslateReturn {
 	untranslatedSources: SourceEntry[];
 	/** Count of sources that need translation */
 	untranslatedCount: number;
+
+	/** Check if a specific locale is translating */
+	isLocaleRunning: (locale: string) => boolean;
+	/** Get progress for a specific locale */
+	getLocaleProgress: (locale: string) => LocaleBatchProgress | null;
 
 	/** Start batch translation */
 	run: (options?: { locale?: string; hashes?: string[] }) => Promise<void>;
@@ -44,7 +51,7 @@ export interface UseBatchTranslateReturn {
  *
  *   return (
  *     <button onClick={translateAll} disabled={isRunning || untranslatedCount === 0}>
- *       {isRunning
+ *       {isRunning && progress
  *         ? `Translating ${progress.current}/${progress.total}...`
  *         : `Translate ${untranslatedCount} strings`
  *       }
@@ -77,17 +84,46 @@ export function useBatchTranslate(): UseBatchTranslateReturn {
 		await store.batchTranslate();
 	}, [store]);
 
+	// Per-locale progress helpers
+	const isLocaleRunning = useCallback(
+		(locale: string) => state.batchProgress[locale] != null,
+		[state.batchProgress]
+	);
+
+	const getLocaleProgress = useCallback(
+		(locale: string) => state.batchProgress[locale] ?? null,
+		[state.batchProgress]
+	);
+
+	// Compute isRunning for active locale
+	const isRunning = state.activeLocale ? state.batchProgress[state.activeLocale] != null : false;
+	const progress = state.activeLocale ? state.batchProgress[state.activeLocale] ?? null : null;
+
 	return useMemo(
 		() => ({
-			isRunning: state.isBatchTranslating,
-			progress: state.batchProgress,
+			isRunning,
+			progress,
+			allProgress: state.batchProgress,
 			error: state.error,
 			untranslatedSources,
 			untranslatedCount: untranslatedSources.length,
+			isLocaleRunning,
+			getLocaleProgress,
 			run,
 			translateSelected,
 			translateAll,
 		}),
-		[state.isBatchTranslating, state.batchProgress, state.error, untranslatedSources, run, translateSelected, translateAll]
+		[
+			isRunning,
+			progress,
+			state.batchProgress,
+			state.error,
+			untranslatedSources,
+			isLocaleRunning,
+			getLocaleProgress,
+			run,
+			translateSelected,
+			translateAll,
+		]
 	);
 }

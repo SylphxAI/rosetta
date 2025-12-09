@@ -23,4 +23,5 @@ export type {
   StatusFilter,
   ViewState,
   AdminState,
+  LocaleBatchProgress,
 } from '../core/types';

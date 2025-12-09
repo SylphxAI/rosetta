@@ -213,6 +213,14 @@ export type StatusFilter = 'all' | 'missing' | 'outdated' | 'unreviewed' | 'revi
 export type ViewState = 'dashboard' | 'editor';
 
 /**
+ * Progress for a single locale's batch translation
+ */
+export interface LocaleBatchProgress {
+	current: number;
+	total: number;
+}
+
+/**
  * Admin store state (framework-agnostic)
  */
 export interface AdminState {
@@ -232,8 +240,8 @@ export interface AdminState {
 
 	// Loading states
 	isLoading: boolean;
-	isBatchTranslating: boolean;
-	batchProgress: { current: number; total: number };
+	/** Per-locale batch translation progress (null = not translating) */
+	batchProgress: Record<string, LocaleBatchProgress | null>;
 
 	// Error state
 	error: string | null;
@@ -252,8 +260,7 @@ export const initialAdminState: AdminState = {
 	statusFilter: 'all',
 	editingHash: null,
 	isLoading: false,
-	isBatchTranslating: false,
-	batchProgress: { current: 0, total: 0 },
+	batchProgress: {},
 	error: null,
 };
 

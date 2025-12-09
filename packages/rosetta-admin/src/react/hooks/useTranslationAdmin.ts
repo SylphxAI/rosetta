@@ -6,7 +6,13 @@
  */
 
 import { useCallback, useMemo } from 'react';
-import type { SourceEntry, StatusFilter, TranslationStatsData, ViewState } from '../../core/types';
+import type {
+	LocaleBatchProgress,
+	SourceEntry,
+	StatusFilter,
+	TranslationStatsData,
+	ViewState,
+} from '../../core/types';
 import { useAdminState, useAdminStore } from '../context';
 
 export interface UseTranslationAdminReturn {
@@ -37,10 +43,14 @@ export interface UseTranslationAdminReturn {
 	// ==================== Loading States ====================
 	/** Is fetching data */
 	isLoading: boolean;
-	/** Is batch translating */
+	/** Is any locale batch translating (for backward compatibility) */
 	isBatchTranslating: boolean;
-	/** Batch translation progress */
-	batchProgress: { current: number; total: number };
+	/** Per-locale batch translation progress */
+	batchProgress: Record<string, LocaleBatchProgress | null>;
+	/** Check if a specific locale is translating */
+	isLocaleTranslating: (locale: string) => boolean;
+	/** Get batch progress for a specific locale */
+	getLocaleBatchProgress: (locale: string) => LocaleBatchProgress | null;
 	/** Error message */
 	error: string | null;
 
@@ -139,6 +149,19 @@ export function useTranslationAdmin(): UseTranslationAdminReturn {
 	const getOutdatedCount = useCallback((locale: string) => store.getOutdatedCount(locale), [store]);
 	const getUntranslatedSources = useCallback(() => store.getUntranslatedSources(), [store]);
 
+	// Per-locale batch progress helpers
+	const isLocaleTranslating = useCallback(
+		(locale: string) => state.batchProgress[locale] != null,
+		[state.batchProgress]
+	);
+	const getLocaleBatchProgress = useCallback(
+		(locale: string) => state.batchProgress[locale] ?? null,
+		[state.batchProgress]
+	);
+
+	// Compute if any locale is translating (for backward compatibility)
+	const isBatchTranslating = Object.keys(state.batchProgress).length > 0;
+
 	return useMemo(
 		() => ({
 			// Data
@@ -158,8 +181,10 @@ export function useTranslationAdmin(): UseTranslationAdminReturn {
 
 			// Loading
 			isLoading: state.isLoading,
-			isBatchTranslating: state.isBatchTranslating,
+			isBatchTranslating,
 			batchProgress: state.batchProgress,
+			isLocaleTranslating,
+			getLocaleBatchProgress,
 			error: state.error,
 
 			// Actions
@@ -183,6 +208,9 @@ export function useTranslationAdmin(): UseTranslationAdminReturn {
 		[
 			state,
 			filteredSources,
+			isBatchTranslating,
+			isLocaleTranslating,
+			getLocaleBatchProgress,
 			enterEditor,
 			exitEditor,
 			setSearchQuery,

@@ -257,6 +257,7 @@ export function createAdminStore(client: AdminAPIClient) {
 	 * Batch translate using AI
 	 * Server-first: only sends locale (and optional hashes), server finds untranslated strings
 	 * Uses streaming when available for real-time progress
+	 * Supports multiple concurrent translations (per-locale progress)
 	 */
 	async function batchTranslate(locale?: string, hashes?: string[]): Promise<void> {
 		const targetLocale = locale || state.activeLocale;
@@ -268,16 +269,20 @@ export function createAdminStore(client: AdminAPIClient) {
 			targetHashes = hashes;
 		} else {
 			// Count missing translations
-			targetHashes = state.sources
+			const currentState = getState();
+			targetHashes = currentState.sources
 				.filter((s) => !s.translations[targetLocale]?.text)
 				.map((s) => s.sourceHash);
 		}
 
 		if (targetHashes.length === 0) return;
 
+		// Set per-locale progress
 		setState({
-			isBatchTranslating: true,
-			batchProgress: { current: 0, total: targetHashes.length },
+			batchProgress: {
+				...getState().batchProgress,
+				[targetLocale]: { current: 0, total: targetHashes.length },
+			},
 			error: null,
 		});
 
@@ -291,8 +296,12 @@ export function createAdminStore(client: AdminAPIClient) {
 			if (client.batchTranslateStream) {
 				await client.batchTranslateStream(request, {
 					onProgress: (current, total) => {
+						const currentState = getState();
 						setState({
-							batchProgress: { current, total },
+							batchProgress: {
+								...currentState.batchProgress,
+								[targetLocale]: { current, total },
+							},
 						});
 					},
 					onTranslation: (sourceHash, translatedText) => {
@@ -322,15 +331,18 @@ export function createAdminStore(client: AdminAPIClient) {
 						});
 					},
 					onError: (message) => {
+						const currentState = getState();
+						const { [targetLocale]: _, ...rest } = currentState.batchProgress;
 						setState({
-							isBatchTranslating: false,
+							batchProgress: rest,
 							error: message,
 						});
 					},
-					onComplete: async (translated, total) => {
+					onComplete: async (_translated, _total) => {
+						const currentState = getState();
+						const { [targetLocale]: _, ...rest } = currentState.batchProgress;
 						setState({
-							isBatchTranslating: false,
-							batchProgress: { current: translated, total },
+							batchProgress: rest,
 						});
 						// Refresh data to get updated stats
 						await fetchData();
@@ -345,10 +357,12 @@ export function createAdminStore(client: AdminAPIClient) {
 					result.translations.map((t) => [t.sourceHash, t.translatedText])
 				);
 
+				const currentState = getState();
+				const { [targetLocale]: _, ...rest } = currentState.batchProgress;
+
 				setState({
-					isBatchTranslating: false,
-					batchProgress: { current: result.translated, total: result.total },
-					sources: state.sources.map((s) => {
+					batchProgress: rest,
+					sources: currentState.sources.map((s) => {
 						const translatedText = translationMap.get(s.sourceHash);
 						if (!translatedText) return s;
 
@@ -372,8 +386,10 @@ export function createAdminStore(client: AdminAPIClient) {
 				await fetchData();
 			}
 		} catch (err) {
+			const currentState = getState();
+			const { [targetLocale]: _, ...rest } = currentState.batchProgress;
 			setState({
-				isBatchTranslating: false,
+				batchProgress: rest,
 				error: err instanceof Error ? err.message : 'Batch translation failed',
 			});
 			throw err;
