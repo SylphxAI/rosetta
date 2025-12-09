@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.8 (2025-12-09)
+
+### ✨ Features
+
+- **rosetta:** add sourceHash for efficient staleness detection ([7ff0088](https://github.com/SylphxAI/rosetta/commit/7ff00889dba4de5fb33dbc85daaf1af1afc727df))
+
+### 🐛 Bug Fixes
+
+- revert package versions after accidental publish ([e6ebd37](https://github.com/SylphxAI/rosetta/commit/e6ebd37f8cea8f8085e94be4257df4184756a30b))
+
 ## 1.0.0
 
 ### Minor Changes
