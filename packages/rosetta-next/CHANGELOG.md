@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.21 (2025-12-09)
+
+### ✨ Features
+
+- **rosetta-next:** robust auto-sync with webpack hooks + process.exit interception ([e100678](https://github.com/SylphxAI/rosetta/commit/e1006787ef9a5891434bd1a9b54b441bffe40fdc))
+
 ## 0.1.20 (2025-12-09)
 
 ### 🐛 Bug Fixes
