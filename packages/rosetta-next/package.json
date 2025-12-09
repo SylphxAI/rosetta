@@ -32,7 +32,7 @@
 		"dist"
 	],
 	"scripts": {
-		"build": "NODE_ENV=production bunup src/locales.ts --format esm --dts --external react --external @sylphx/rosetta && bunup src/index.tsx src/server.tsx --format esm --dts --external react --external @sylphx/rosetta --no-clean && bunup src/loader.ts src/sync.ts --format esm,cjs --dts --external react --external @sylphx/rosetta --no-clean",
+		"build": "NODE_ENV=production bunup src/locales.ts --format esm --dts --external react --external @sylphx/rosetta && bunup src/index.tsx src/server.tsx --format esm --dts --external react --external @sylphx/rosetta --jsx.runtime automatic --jsx.import-source react --no-clean && bunup src/loader.ts src/sync.ts --format esm,cjs --dts --external react --external @sylphx/rosetta --no-clean",
 		"dev": "bunup src/index.tsx src/server.tsx src/loader.ts src/sync.ts --format esm --dts --external react --external @sylphx/rosetta --watch",
 		"test": "bun test",
 		"typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.node.json",
