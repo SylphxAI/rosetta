@@ -171,10 +171,19 @@ Return a JSON object with "translations" array containing objects with "sourceHa
 			}
 
 			const data = (await response.json()) as OpenRouterResponse;
-			const content = data.choices[0]?.message?.content;
+			const rawContent = data.choices[0]?.message?.content;
 
-			if (!content) {
+			if (!rawContent) {
 				throw new Error('No response content from OpenRouter');
+			}
+
+			// Strip markdown code fences if present (some models ignore response_format)
+			let content = rawContent.trim();
+			if (content.startsWith('```')) {
+				// Remove opening fence (```json or ```)
+				content = content.replace(/^```(?:json)?\s*\n?/, '');
+				// Remove closing fence
+				content = content.replace(/\n?```\s*$/, '');
 			}
 
 			// Parse JSON response
