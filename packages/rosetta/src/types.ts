@@ -111,17 +111,6 @@ export interface StorageAdapter {
 	getTranslations(locale: string): Promise<Map<string, string>>;
 
 	/**
-	 * Register source strings (batch insert, skip duplicates)
-	 */
-	registerSources(
-		sources: Array<{
-			text: string;
-			hash: string;
-			context?: string;
-		}>
-	): Promise<void>;
-
-	/**
 	 * Save a single translation
 	 */
 	saveTranslation(

@@ -2,7 +2,7 @@
  * Rosetta Turbopack/Webpack Loader
  *
  * Extracts t() calls from source files during build.
- * Writes extracted strings to .rosetta/manifest.json
+ * Writes extracted strings to public/rosetta/manifest.json
  *
  * Features:
  * - Atomic writes (temp file + rename)
@@ -28,7 +28,7 @@ import { hashText } from '@sylphx/rosetta';
 // Configuration
 // ============================================
 
-const DEFAULT_MANIFEST_DIR = '.rosetta';
+const DEFAULT_MANIFEST_DIR = 'public/rosetta';
 const MANIFEST_FILE = 'manifest.json';
 
 function getManifestDir(): string {
@@ -312,8 +312,8 @@ function buildRouteMappings(): Record<string, string[]> {
  * Also detects hash collisions and sorts output for deterministic diffs
  *
  * Writes two files:
- * - manifest.json: Array of strings for sync to database
- * - routes.json: Route to hash mapping for page-level loading
+ * - public/rosetta/manifest.json: Array of strings for sync to database
+ * - public/rosetta/routes.json: Route to hash mapping for page-level loading
  */
 function writeManifestAtomic(): void {
 	try {

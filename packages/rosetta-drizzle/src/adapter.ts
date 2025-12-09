@@ -249,63 +249,6 @@ export class DrizzleStorageAdapter<
 	}
 
 	/**
-	 * Register source strings (batch insert, skip duplicates)
-	 * Increments occurrence count for existing sources.
-	 */
-	async registerSources(
-		items: Array<{
-			text: string;
-			hash: string;
-			context?: string;
-		}>
-	): Promise<void> {
-		if (items.length === 0) return;
-
-		const now = new Date();
-
-		// Get existing hashes
-		const hashes = items.map((i) => i.hash);
-		const existing = (await this.db
-			.select({ hash: this.sources.hash })
-			.from(this.sources)
-			.where(inArray(this.sources.hash, hashes))) as Array<{
-			hash: string;
-		}>;
-
-		const existingSet = new Set(existing.map((e) => e.hash));
-
-		// Insert new items only
-		const newItems = items.filter((i) => !existingSet.has(i.hash));
-		if (newItems.length > 0) {
-			await this.db
-				.insert(this.sources)
-				.values(
-					newItems.map((item) => ({
-						hash: item.hash,
-						text: item.text,
-						context: item.context ?? null,
-						occurrences: 1,
-						firstSeenAt: now,
-						lastSeenAt: now,
-					}))
-				)
-				.onConflictDoNothing();
-		}
-
-		// Bulk update occurrences for existing items (single query instead of N queries)
-		const existingHashes = items.filter((i) => existingSet.has(i.hash)).map((i) => i.hash);
-		if (existingHashes.length > 0) {
-			await this.db
-				.update(this.sources)
-				.set({
-					occurrences: sql`${this.sources.occurrences} + 1`,
-					lastSeenAt: now,
-				})
-				.where(inArray(this.sources.hash, existingHashes));
-		}
-	}
-
-	/**
 	 * Save a single translation
 	 */
 	async saveTranslation(
@@ -362,11 +305,6 @@ export class DrizzleStorageAdapter<
 				target: [this.translations.locale, this.translations.hash],
 				set: updateSet,
 			});
-
-		// If sourceText provided, ensure source exists
-		if (options?.sourceText) {
-			await this.registerSources([{ text: options.sourceText, hash, context: options.context }]);
-		}
 	}
 
 	/**
@@ -638,18 +576,6 @@ export class DrizzleStorageAdapter<
 				target: [this.translations.locale, this.translations.hash],
 				set: updateSet,
 			});
-
-		// Register source strings if provided (batch)
-		const sourcesToRegister = items
-			.filter((item) => item.sourceText)
-			.map((item) => ({
-				text: item.sourceText!,
-				hash: item.hash,
-			}));
-
-		if (sourcesToRegister.length > 0) {
-			await this.registerSources(sourcesToRegister);
-		}
 	}
 
 	/**

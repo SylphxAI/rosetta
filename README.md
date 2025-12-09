@@ -105,17 +105,6 @@ export const storage: StorageAdapter = {
     return new Map(rows.map(r => [r.hash, r.text]));
   },
 
-  async registerSources(sources) {
-    if (sources.length === 0) return;
-    await db.insert(rosettaSources)
-      .values(sources.map(s => ({
-        hash: s.hash,
-        text: s.text,
-        context: s.context,
-      })))
-      .onConflictDoNothing();
-  },
-
   async saveTranslation(locale, hash, text, options) {
     await db.insert(rosettaTranslations)
       .values({
@@ -146,6 +135,14 @@ export const storage: StorageAdapter = {
     }
     return db.select().from(rosettaSources)
       .where(notInArray(rosettaSources.hash, hashes));
+  },
+
+  async getAvailableLocales() {
+    const results = await db
+      .select({ locale: rosettaTranslations.locale })
+      .from(rosettaTranslations)
+      .groupBy(rosettaTranslations.locale);
+    return results.map(r => r.locale);
   },
 };
 ```
@@ -640,13 +637,13 @@ This ensures only one process syncs, regardless of deployment target.
 
 **Pattern 2: Force Lock for Serverless**
 ```typescript
-// Acceptable for idempotent operations like string registration
+// For environments where file-based locking doesn't work
 await syncRosetta(storage, {
   forceLock: true,  // Skip lock acquisition
   verbose: true,
 });
 ```
-⚠️ May cause duplicate DB calls but `registerSources` is idempotent (uses `ON CONFLICT DO NOTHING`).
+⚠️ May cause duplicate sync operations in concurrent scenarios.
 
 **Pattern 3: Custom Database Lock**
 ```typescript
