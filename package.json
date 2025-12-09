@@ -14,6 +14,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
+		"@changesets/cli": "^2.29.8",
 		"@sylphx/bump": "^1.6.1",
 		"typescript": "^5.7.2"
 	},

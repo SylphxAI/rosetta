@@ -1,10 +1,24 @@
 # Changelog
 
+## 0.1.5 (2025-12-09)
+
+### ✨ Features
+
+- **rosetta-admin:** add SSE streaming for batch translation progress
+  - `batchTranslate` now only requires `{ locale }`
+  - Server looks up untranslated strings from storage
+  - Optional `hashes` array for selective translation
+  - No more sending sourceText from client
+  - **SSE streaming support**: Real-time progress updates as translations complete
+    - Server streams progress events via SSE when `Accept: text/event-stream` header is set
+    - Client can use `batchTranslateStream` for real-time UI updates
+    - Falls back to non-streaming mode if SSE not requested
+
 ## 0.1.4 (2025-12-09)
 
 ### ♻️ Refactoring
 
-- **rosetta-admin:** server-first batch translate API ([2d57a6a](https://github.com/SylphxAI/rosetta/commit/2d57a6a899550d88b674871f80ef2c185ee5ef70))
+- **rosetta-admin:** server-first batch translate API
 
 ## 0.1.3 (2025-12-09)
 

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.1
+
+### Patch Changes
+
+- 566d4e9: Fix zod dependency for tRPC router build
+
+  - Add zod to optionalDependencies for tRPC support
+  - Publish initial translator packages
+
 ## 0.1.0 (2025-12-09)
 
 ### ✨ Features

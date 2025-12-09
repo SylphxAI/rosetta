@@ -1,6 +1,6 @@
 {
 	"name": "@sylphx/rosetta-translator-openrouter",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "OpenRouter translator for @sylphx/rosetta-admin",
 	"license": "MIT",
 	"type": "module",

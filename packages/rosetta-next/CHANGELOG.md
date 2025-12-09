@@ -1,5 +1,174 @@
 # Changelog
 
+## 1.0.0
+
+### Minor Changes
+
+- 0ba0566: feat(rosetta-next): add Turbopack/Webpack loader for compile-time string extraction
+
+  - `@sylphx/rosetta-next/loader` - extracts t() calls during build
+  - `@sylphx/rosetta-next/sync` - syncs extracted strings to storage
+  - Writes to `.rosetta/manifest.json` during build
+  - `syncRosetta()` function to register strings to DB
+  - `withRosetta()` Next.js config wrapper (optional)
+
+- 8abda25: refactor: Improve type safety, add validation, and comprehensive testing
+
+  **@sylphx/rosetta:**
+
+  - New `@sylphx/rosetta/icu` entry point for shared ICU MessageFormat implementation
+  - New validation module with input size limits (10KB max text, 1000 batch size)
+  - Exports: `validateText`, `validateLocale`, `assertValidText`, etc.
+  - Consistent security limits across server/client (depth=5, length=50KB, iterations=100)
+  - Server uses 50-entry LRU cache, client uses 10-entry cache
+  - OpenRouter adapter now has configurable timeout (default 30s)
+
+  **@sylphx/rosetta-drizzle:**
+
+  - Generic type parameters for tables (`DrizzleStorageAdapter<S, T>`)
+  - Runtime validation for required columns at construction time
+  - New type exports: `DrizzleQueryBuilder`, `SourcesTable`, `TranslationsTable`
+  - Fix: `registerSources` now correctly increments occurrences for existing sources
+  - 34 comprehensive tests with bun:sqlite in-memory database
+
+  **@sylphx/rosetta-next:**
+
+  - `MANIFEST_DIR` now reads env at runtime (testability improvement)
+  - 36 comprehensive tests for loader extraction and sync functionality
+  - Tests cover: t() extraction, manifest ops, sync to storage, lock handling
+
+- 2c1f64f: Comprehensive reliability and performance improvements
+
+  **Breaking Changes:**
+
+  - Auto-sync removed from RosettaProvider - use `syncRosetta()` explicitly in postbuild script
+  - `syncRosetta()` return type changed to include `lockAcquired` and `skipped` fields
+
+  **Critical Fixes:**
+
+  - Fixed race conditions in serverless/multi-pod deployments with distributed file lock
+  - Fixed manifest deletion timing - production preserves manifest by default
+  - Fixed atomic manifest writes using temp file + rename pattern
+  - Fixed ICU pluralization to use actual locale instead of hardcoded 'en'
+  - Fixed hash collision detection in both loader and sync
+
+  **New Features:**
+
+  - Configurable manifest directory via `ROSETTA_MANIFEST_DIR` env var
+  - Manifest schema validation with detailed error reporting
+  - Debounced manifest writes (100ms) to batch multiple file changes
+  - Sorted manifest output for deterministic diffs
+  - Lock acquisition timeout and stale lock recovery
+
+  **Performance:**
+
+  - Removed fs.existsSync calls from request path (no more file I/O per request)
+  - Clear collected strings after write to prevent memory growth
+
+  **Utilities:**
+
+  - Added `flushManifest()` for testing/manual sync
+  - Added `resetLoaderState()` for testing
+
+- a37df1a: feat(rosetta-next): add locale utilities for language picker
+
+  New server utilities:
+
+  - `getReadyLocales(rosetta, config)` - Get locales with translation coverage stats
+  - `LocaleConfig` type - Define locale names, native names, and min coverage thresholds
+  - `buildLocaleCookie()` / `parseLocaleCookie()` - Server-side cookie helpers
+
+  New client utilities:
+
+  - `setLocaleCookie(locale)` - Set locale preference and optionally reload
+  - `getLocaleCookie()` - Read current locale preference
+  - `clearLocaleCookie()` - Clear locale preference
+
+  New locale data (`@sylphx/rosetta-next/locales` or main export):
+
+  - `ALL_LOCALES` - Complete list of 130+ world languages with codes, names, and native names
+  - `COMMON_LOCALES` - Top 30 languages by internet usage
+  - `getAllLocales()` / `getCommonLocales()` - Get locale lists
+  - `getLocaleByCode(code)` - Find specific locale info
+  - `searchLocales(query)` - Search by name or native name
+  - `isValidLocale(code)` - Validate locale codes
+
+- 64d88e4: feat(rosetta-next): add page-level translation loading (zero-config)
+
+  Automatic optimization that loads only the translations needed for each page:
+
+  - Build generates `routes.json` mapping routes to translation hashes
+  - `RosettaProvider` automatically uses route manifest for optimized loading
+  - Supports Next.js App Router conventions (pages, layouts, route groups, dynamic segments)
+  - Shared components marked as `_shared` and included in all routes
+  - Falls back to loading all translations if no manifest exists
+
+  ```tsx
+  // Zero-config - automatic optimization
+  <RosettaProvider rosetta={rosetta} locale={locale}>
+    {children}
+  </RosettaProvider>
+
+  // Or with explicit pathname for nested layouts
+  <RosettaProvider rosetta={rosetta} locale={locale} pathname="/products">
+    {children}
+  </RosettaProvider>
+  ```
+
+  New exports from loader:
+
+  - `readRoutes()` - Read route manifest
+  - `getHashesForRoute(route)` - Get hashes for a specific route
+  - `filePathToRoute()` - Convert file paths to routes (for testing)
+
+- 2c2d43d: Security and performance improvements:
+
+  **Security Fixes:**
+
+  - ReDoS-safe regex patterns with bounded repetition in loader
+  - ICU parsing depth limits to prevent DoS attacks
+  - Prototype pollution prevention using Map for translations lookup
+  - Path traversal validation for ROSETTA_MANIFEST_DIR
+  - Error boundaries in translation function
+
+  **Performance Improvements:**
+
+  - Cache Intl.PluralRules instances per locale (2-5x faster plurals)
+  - Memory safety limits for large codebases
+
+  **Bug Fixes:**
+
+  - Fixed hash mismatch between loader and client by importing hashText from core
+  - Added context extraction support in loader to match runtime behavior
+  - Fixed webpack loader with enforce:'pre' to run before other loaders
+
+### Patch Changes
+
+- 5b58cae: feat(rosetta): add CLI for compile-time string extraction
+
+  - `rosetta extract` scans source files for t() calls
+  - Extracts strings and generates JSON output
+  - Supports --root, --output, --verbose, --include, --exclude options
+  - Remove runtime string collection (use compile-time extraction instead)
+
+- 2183abe: Add automatic manifest sync on first request
+
+  - RosettaProvider now auto-syncs extracted strings from .rosetta/manifest.json to storage
+  - Sync runs once per server lifecycle on first render
+  - Eliminates need for manual postbuild scripts
+
+- 101d507: fix(rosetta-next): use production JSX runtime instead of development
+- 284b162: fix(rosetta-next): fix duplicate export in locales.js build
+
+  Fixed bundler issue causing duplicate export statements in the built locales.js file.
+
+- Updated dependencies [5b58cae]
+- Updated dependencies [8abda25]
+- Updated dependencies [e9a4fe3]
+- Updated dependencies [d7f08b6]
+- Updated dependencies [96e2d0f]
+  - @sylphx/rosetta@0.2.0
+
 ## 0.1.17 (2025-12-08)
 
 ### 🐛 Bug Fixes

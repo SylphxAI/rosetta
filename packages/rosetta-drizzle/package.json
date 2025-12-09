@@ -1,6 +1,6 @@
 {
 	"name": "@sylphx/rosetta-drizzle",
-	"version": "0.1.9",
+	"version": "1.0.0",
 	"description": "Drizzle ORM storage adapter for @sylphx/rosetta",
 	"license": "MIT",
 	"type": "module",
@@ -27,7 +27,7 @@
 		"clean": "rm -rf dist"
 	},
 	"peerDependencies": {
-		"@sylphx/rosetta": ">=0.1.0",
+		"@sylphx/rosetta": ">=0.2.0",
 		"drizzle-orm": ">=0.38.0"
 	},
 	"devDependencies": {

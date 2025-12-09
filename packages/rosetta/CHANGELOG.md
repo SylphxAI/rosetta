@@ -1,5 +1,88 @@
 # Changelog
 
+## 0.2.0
+
+### Minor Changes
+
+- 5b58cae: feat(rosetta): add CLI for compile-time string extraction
+
+  - `rosetta extract` scans source files for t() calls
+  - Extracts strings and generates JSON output
+  - Supports --root, --output, --verbose, --include, --exclude options
+  - Remove runtime string collection (use compile-time extraction instead)
+
+- 8abda25: refactor: Improve type safety, add validation, and comprehensive testing
+
+  **@sylphx/rosetta:**
+
+  - New `@sylphx/rosetta/icu` entry point for shared ICU MessageFormat implementation
+  - New validation module with input size limits (10KB max text, 1000 batch size)
+  - Exports: `validateText`, `validateLocale`, `assertValidText`, etc.
+  - Consistent security limits across server/client (depth=5, length=50KB, iterations=100)
+  - Server uses 50-entry LRU cache, client uses 10-entry cache
+  - OpenRouter adapter now has configurable timeout (default 30s)
+
+  **@sylphx/rosetta-drizzle:**
+
+  - Generic type parameters for tables (`DrizzleStorageAdapter<S, T>`)
+  - Runtime validation for required columns at construction time
+  - New type exports: `DrizzleQueryBuilder`, `SourcesTable`, `TranslationsTable`
+  - Fix: `registerSources` now correctly increments occurrences for existing sources
+  - 34 comprehensive tests with bun:sqlite in-memory database
+
+  **@sylphx/rosetta-next:**
+
+  - `MANIFEST_DIR` now reads env at runtime (testability improvement)
+  - 36 comprehensive tests for loader extraction and sync functionality
+  - Tests cover: t() extraction, manifest ops, sync to storage, lock handling
+
+- 96e2d0f: feat: Add caching layer for serverless deployments
+
+  New cache adapters to reduce database queries in serverless environments:
+
+  - **InMemoryCache**: LRU cache with TTL for traditional Node.js servers
+  - **ExternalCache**: Redis/Upstash adapter for serverless (Vercel, Lambda)
+  - **RequestScopedCache**: Request-level deduplication
+
+  Usage:
+
+  ```ts
+  // Serverless with Upstash Redis
+  import { Redis } from "@upstash/redis";
+  import { ExternalCache, Rosetta } from "@sylphx/rosetta/server";
+
+  const redis = new Redis({ url, token });
+  const cache = new ExternalCache(redis, { ttlSeconds: 60 });
+
+  const rosetta = new Rosetta({
+    storage,
+    cache, // Optional cache adapter
+    defaultLocale: "en",
+  });
+  ```
+
+  Also adds `rosetta.invalidateCache(locale?)` to clear cached translations after updates.
+
+### Patch Changes
+
+- e9a4fe3: fix(rosetta): remove duplicate exports from bunup build output
+
+  Added post-build script to fix bunup bundler bug that generates duplicate export statements.
+
+- d7f08b6: Performance and security improvements:
+
+  **Performance:**
+
+  - Cache `Intl.PluralRules` instances per locale on server (2-5x faster plurals)
+  - Single-pass regex interpolation: O(n) instead of O(m×n)
+
+  **Security:**
+
+  - Add ICU parsing depth limits to server (matching client)
+  - Add iteration limits to prevent infinite loops
+  - Fix `replaceHash` to use replacer function (avoids $ interpretation)
+  - Add text length limits (50k chars max)
+
 ## 0.1.7 (2025-12-08)
 
 ### ✨ Features
