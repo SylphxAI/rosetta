@@ -48,14 +48,8 @@ const MarkAsReviewedSchema = z.object({
 });
 
 const BatchTranslateSchema = z.object({
-	items: z.array(
-		z.object({
-			sourceHash: z.string(),
-			sourceText: z.string(),
-			context: z.string().nullish(),
-		})
-	),
 	locale: z.string(),
+	hashes: z.array(z.string()).optional(),
 });
 
 const AddLocaleSchema = z.object({

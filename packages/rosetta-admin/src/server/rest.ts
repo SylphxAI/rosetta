@@ -137,17 +137,13 @@ export function createRestHandlers(config: RestHandlersConfig): RestHandlers {
 
 			try {
 				const body = await request.json();
-				const { items, locale } = body;
-
-				if (!items || !Array.isArray(items) || items.length === 0) {
-					return Response.json({ error: 'items array is required' }, { status: 400 });
-				}
+				const { locale, hashes } = body;
 
 				if (!locale || locale === 'en') {
 					return Response.json({ error: 'Valid non-English locale is required' }, { status: 400 });
 				}
 
-				const result = await service.batchTranslate({ items, locale });
+				const result = await service.batchTranslate({ locale, hashes });
 
 				return Response.json(result);
 			} catch (error) {

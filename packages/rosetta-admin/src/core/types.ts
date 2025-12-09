@@ -128,10 +128,12 @@ export interface BatchTranslationItem {
 
 /**
  * Request body for batch translation
+ * Server-first: server finds untranslated strings
  */
 export interface BatchTranslateRequest {
-	items: BatchTranslationItem[];
 	locale: string;
+	/** Optional: specific hashes to translate (if omitted, translates all missing) */
+	hashes?: string[];
 }
 
 /**

@@ -255,38 +255,35 @@ export function createAdminStore(client: AdminAPIClient) {
 
 	/**
 	 * Batch translate using AI
+	 * Server-first: only sends locale (and optional hashes), server finds untranslated strings
 	 */
 	async function batchTranslate(locale?: string, hashes?: string[]): Promise<void> {
 		const targetLocale = locale || state.activeLocale;
 		if (!targetLocale) throw new Error('No locale selected');
 
-		// Get items to translate
-		let items = state.sources
-			.filter((s) => !s.translations[targetLocale]?.text) // Missing translations
-			.map((s) => ({
-				sourceHash: s.sourceHash,
-				sourceText: s.effectiveSource,
-				context: s.context,
-			}));
-
-		// Filter by specific hashes if provided
+		// Count items to translate (for progress display)
+		let targetHashes: string[] | undefined;
 		if (hashes && hashes.length > 0) {
-			const hashSet = new Set(hashes);
-			items = items.filter((item) => hashSet.has(item.sourceHash));
+			targetHashes = hashes;
+		} else {
+			// Count missing translations
+			targetHashes = state.sources
+				.filter((s) => !s.translations[targetLocale]?.text)
+				.map((s) => s.sourceHash);
 		}
 
-		if (items.length === 0) return;
+		if (targetHashes.length === 0) return;
 
 		setState({
 			isBatchTranslating: true,
-			batchProgress: { current: 0, total: items.length },
+			batchProgress: { current: 0, total: targetHashes.length },
 			error: null,
 		});
 
 		try {
 			const result = await client.batchTranslate({
-				items,
 				locale: targetLocale,
+				hashes: hashes, // Only send if specific hashes requested
 			});
 
 			// Update sources with new translations
@@ -294,7 +291,7 @@ export function createAdminStore(client: AdminAPIClient) {
 
 			setState({
 				isBatchTranslating: false,
-				batchProgress: { current: result.translated, total: items.length },
+				batchProgress: { current: result.translated, total: result.total },
 				sources: state.sources.map((s) => {
 					const translatedText = translationMap.get(s.sourceHash);
 					if (!translatedText) return s;
