@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.19 (2025-12-09)
+
+### ✨ Features
+
+- **rosetta-next:** add zero-config auto-sync with storage option ([1732dd6](https://github.com/SylphxAI/rosetta/commit/1732dd6307ecf5a4f88310a576b32f384da4e089))
+
 ## 0.1.18 (2025-12-09)
 
 ### 🐛 Bug Fixes

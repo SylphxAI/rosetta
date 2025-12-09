@@ -32,7 +32,7 @@
     },
     "packages/rosetta-admin": {
       "name": "@sylphx/rosetta-admin",
-      "version": "0.1.7",
+      "version": "0.1.8",
       "devDependencies": {
         "@biomejs/biome": "^2.3.8",
         "@sylphx/biome-config": "^0.4.1",
@@ -59,7 +59,7 @@
     },
     "packages/rosetta-drizzle": {
       "name": "@sylphx/rosetta-drizzle",
-      "version": "0.1.9",
+      "version": "0.1.10",
       "devDependencies": {
         "@types/better-sqlite3": "^7.6.13",
         "@types/bun": "^1.1.14",
@@ -77,7 +77,7 @@
     },
     "packages/rosetta-next": {
       "name": "@sylphx/rosetta-next",
-      "version": "0.1.17",
+      "version": "0.1.18",
       "devDependencies": {
         "@types/node": "^22",
         "@types/react": "^19",
