@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.7 (2025-12-09)
+
+### ✨ Features
+
+- **rosetta-admin:** add per-locale batch translation progress ([1c49b75](https://github.com/SylphxAI/rosetta/commit/1c49b759f976801a20066c09922f4fffc85585b6))
+
 ## 0.1.6 (2025-12-09)
 
 ### 🐛 Bug Fixes
