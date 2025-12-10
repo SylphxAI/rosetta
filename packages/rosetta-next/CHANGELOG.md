@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.2 (2025-12-10)
+
+### 🐛 Bug Fixes
+
+- remove node:module deps for Edge runtime compatibility ([23c73bd](https://github.com/SylphxAI/rosetta/commit/23c73bd26c654ffc17c5d556431a3dc576e1b1b8))
+
 ## 0.3.1 (2025-12-10)
 
 Deprecate withRosetta in favor of CLI extraction

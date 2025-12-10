@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.2 (2025-12-10)
+
+### 📦 Dependencies
+
+- Updated `@sylphx/rosetta` to 0.5.2
+
 ## 0.3.1 (2025-12-10)
 
 Simplify to CLI-based manifest extraction, remove createManifestReader
