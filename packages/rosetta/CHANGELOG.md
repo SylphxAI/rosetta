@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.1 (2025-12-10)
+
+### ✨ Features
+
+- **cli:** add --watch mode for dev hot reload ([894ad62](https://github.com/SylphxAI/rosetta/commit/894ad62adb148db6ecdb5129af9388ac39ad53e0))
+- **rosetta:** add TypeScript manifest generation ([1422741](https://github.com/SylphxAI/rosetta/commit/1422741c5d71b7b350bd3308da182cfe4f64f51f))
+
+### ⏪ Reverts
+
+- remove manual version bumps (CI handles releases) ([f3d9b06](https://github.com/SylphxAI/rosetta/commit/f3d9b06e1a45028fa83a311b7caed543ae41d67e))
+
 ## 0.4.0 (2025-12-09)
 
 ### ✨ Features

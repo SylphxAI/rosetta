@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.2.2 (2025-12-10)
+
+### ✨ Features
+
+- **rosetta:** add TypeScript manifest generation ([1422741](https://github.com/SylphxAI/rosetta/commit/1422741c5d71b7b350bd3308da182cfe4f64f51f))
+- **rosetta-admin:** add createManifestReader helper ([6959183](https://github.com/SylphxAI/rosetta/commit/6959183f40ce2830035476e83c6624b89bae6c5b))
+
+### ♻️ Refactoring
+
+- simplify to CLI-based manifest extraction ([bae3c39](https://github.com/SylphxAI/rosetta/commit/bae3c399ef9c85c6b458cfc83c34a337a0a8b7a0))
+
+### ⏪ Reverts
+
+- remove manual version bumps (CI handles releases) ([f3d9b06](https://github.com/SylphxAI/rosetta/commit/f3d9b06e1a45028fa83a311b7caed543ae41d67e))
+
 ## 0.2.0 (2025-12-09)
 
 ### ✨ Features
