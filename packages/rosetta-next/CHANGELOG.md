@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.2.1 (2025-12-10)
+
+Deprecate withRosetta in favor of CLI extraction
+
+### ♻️ Refactoring
+
+- simplify to CLI-based manifest extraction ([bae3c39](https://github.com/SylphxAI/rosetta/commit/bae3c399ef9c85c6b458cfc83c34a337a0a8b7a0))
+
+### ⏪ Reverts
+
+- remove manual version bumps (CI handles releases) ([f3d9b06](https://github.com/SylphxAI/rosetta/commit/f3d9b06e1a45028fa83a311b7caed543ae41d67e))
+
 ## 0.2.0 (2025-12-09)
 
 ### ✨ Features
