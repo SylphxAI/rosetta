@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.3 (2025-12-11)
+
+### 🐛 Bug Fixes
+
+- **rosetta:** disable code splitting to fix missing hashText/DEFAULT_LOCALE ([767c4fe](https://github.com/SylphxAI/rosetta/commit/767c4fef86e5d4ba97f7df03d86a2ae2f29b883b))
+
 ## 0.5.2 (2025-12-10)
 
 ### 🐛 Bug Fixes

@@ -15,7 +15,7 @@
     },
     "packages/rosetta": {
       "name": "@sylphx/rosetta",
-      "version": "0.5.1",
+      "version": "0.5.2",
       "bin": {
         "rosetta": "./dist/cli/index.js",
       },
@@ -32,7 +32,7 @@
     },
     "packages/rosetta-admin": {
       "name": "@sylphx/rosetta-admin",
-      "version": "0.3.1",
+      "version": "0.3.2",
       "devDependencies": {
         "@biomejs/biome": "^2.3.8",
         "@sylphx/biome-config": "^0.4.1",
@@ -77,7 +77,7 @@
     },
     "packages/rosetta-next": {
       "name": "@sylphx/rosetta-next",
-      "version": "0.3.1",
+      "version": "0.3.2",
       "devDependencies": {
         "@types/node": "^22",
         "@types/react": "^19",
