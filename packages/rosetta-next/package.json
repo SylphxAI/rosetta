@@ -32,7 +32,7 @@
 		"dist"
 	],
 	"scripts": {
-		"build": "NODE_ENV=production bunup src/locales.ts --format esm --dts --external react --external @sylphx/rosetta && bunup src/index.tsx src/server.tsx --format esm --dts --external react --external @sylphx/rosetta --jsx.runtime automatic --jsx.import-source react --no-clean && bunup src/loader.ts src/sync.ts --format esm,cjs --dts --external react --external @sylphx/rosetta --no-clean && npm run build:fix-jsx",
+		"build": "NODE_ENV=production bunup src/locales.ts --format esm --dts --external react --external @sylphx/rosetta --splitting=false && bunup src/index.tsx src/server.tsx --format esm --dts --external react --external @sylphx/rosetta --jsx.runtime automatic --jsx.import-source react --no-clean --splitting=false && bunup src/loader.ts src/sync.ts --format esm,cjs --dts --external react --external @sylphx/rosetta --no-clean --splitting=false && npm run build:fix-jsx",
 		"build:fix-jsx": "find dist -name '*.js' -exec sed -i.bak 's/jsx-dev-runtime/jsx-runtime/g; s/jsxDEV/jsx/g' {} \\; && find dist -name '*.bak' -delete",
 		"dev": "bunup src/index.tsx src/server.tsx src/loader.ts src/sync.ts --format esm --dts --external react --external @sylphx/rosetta --watch",
 		"test": "bun test",
