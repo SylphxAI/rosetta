@@ -34,8 +34,7 @@
 		"dist"
 	],
 	"scripts": {
-		"build": "bunup src/index.ts --dts --format esm,cjs && bunup src/server/index.ts src/adapters/index.ts src/icu.ts src/cli/index.ts --dts --clean=false && bun run build:fix",
-		"build:fix": "node -e \"const fs=require('fs');['icu.js','server/index.js','adapters/index.js'].forEach(f=>{const p='dist/'+f;if(fs.existsSync(p)){let c=fs.readFileSync(p,'utf8');c=c.replace(/\\n\\nexport \\{[^}]+\\};\\s*$/,'');c=c.replace(/^import[^;]+chunk-[^;]+\\.js[^;]*;\\n?/gm,'');fs.writeFileSync(p,c+'\\n')}})\"",
+		"build": "bunup src/index.ts --dts --format esm,cjs && bunup src/server/index.ts src/adapters/index.ts src/icu.ts src/cli/index.ts --dts --clean=false --splitting=false",
 		"dev": "bunup src/index.ts src/server/index.ts src/adapters/index.ts src/icu.ts --dts --watch",
 		"test": "bun test",
 		"typecheck": "tsc --noEmit",
