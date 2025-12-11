@@ -471,4 +471,3 @@ export function createAdminStore(client: AdminAPIClient): AdminStore {
 		removeLocale: removeLocale,
 	};
 }
-

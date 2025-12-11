@@ -333,7 +333,13 @@ describe('loader security', () => {
 // Route Detection Tests
 // ============================================
 
-import { filePathToRoute, getAssociatedRoutes, readRoutes, getHashesForRoute, getRoutesPath } from '../loader';
+import {
+	filePathToRoute,
+	getAssociatedRoutes,
+	readRoutes,
+	getHashesForRoute,
+	getRoutesPath,
+} from '../loader';
 
 describe('route detection', () => {
 	describe('filePathToRoute', () => {

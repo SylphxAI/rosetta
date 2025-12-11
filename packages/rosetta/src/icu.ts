@@ -178,10 +178,7 @@ export function formatMessage(
 
 	// Safety: Limit text length
 	if (text.length > MAX_TEXT_LENGTH) {
-		options?.onError?.(
-			new Error(`Text exceeds ${MAX_TEXT_LENGTH} characters`),
-			'formatMessage'
-		);
+		options?.onError?.(new Error(`Text exceeds ${MAX_TEXT_LENGTH} characters`), 'formatMessage');
 		text = text.slice(0, MAX_TEXT_LENGTH);
 	}
 
@@ -362,11 +359,7 @@ function selectPluralOption(
 	}
 
 	// Then try plural category
-	const category = getPluralCategory(
-		count,
-		options?.locale ?? 'en',
-		options?.pluralRulesCache
-	);
+	const category = getPluralCategory(count, options?.locale ?? 'en', options?.pluralRulesCache);
 
 	const template = optionMap[category] ?? optionMap.other;
 	return template ? replaceHash(template, count) : '';

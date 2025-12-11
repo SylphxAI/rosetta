@@ -114,7 +114,12 @@ interface TranslationResponse {
  * Create an Anthropic-based translator
  */
 export function createAnthropicTranslator(config: AnthropicTranslatorConfig): TranslateFunction {
-	const { apiKey, model, batchSize = DEFAULT_BATCH_SIZE, systemPrompt = defaultSystemPrompt } = config;
+	const {
+		apiKey,
+		model,
+		batchSize = DEFAULT_BATCH_SIZE,
+		systemPrompt = defaultSystemPrompt,
+	} = config;
 
 	const anthropic = new Anthropic({ apiKey });
 

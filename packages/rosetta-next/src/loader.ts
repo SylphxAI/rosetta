@@ -113,7 +113,10 @@ function filePathToRoute(filePath: string): string | null {
 	let route = '/' + relativePath;
 
 	// Remove file extension and route file name
-	route = route.replace(/\/(page|layout|template|loading|error|not-found|default)\.(tsx?|jsx?)$/, '');
+	route = route.replace(
+		/\/(page|layout|template|loading|error|not-found|default)\.(tsx?|jsx?)$/,
+		''
+	);
 
 	// Remove route groups: (marketing) → ''
 	route = route.replace(/\/\([^)]+\)/g, '');

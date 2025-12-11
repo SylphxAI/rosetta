@@ -97,7 +97,7 @@ export function useBatchTranslate(): UseBatchTranslateReturn {
 
 	// Compute isRunning for active locale
 	const isRunning = state.activeLocale ? state.batchProgress[state.activeLocale] != null : false;
-	const progress = state.activeLocale ? state.batchProgress[state.activeLocale] ?? null : null;
+	const progress = state.activeLocale ? (state.batchProgress[state.activeLocale] ?? null) : null;
 
 	return useMemo(
 		() => ({

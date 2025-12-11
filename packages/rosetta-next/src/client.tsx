@@ -102,10 +102,7 @@ export function RosettaClientProvider({
 }: RosettaClientProviderProps): React.ReactElement {
 	// Convert to Map for safe lookup (prevents prototype pollution attacks)
 	// Also memoize to avoid recreating on every render
-	const translationsMap = useMemo(
-		() => new Map(Object.entries(translations)),
-		[translations]
-	);
+	const translationsMap = useMemo(() => new Map(Object.entries(translations)), [translations]);
 
 	// Memoize t function to prevent unnecessary re-renders
 	// Include locale in deps to update when locale changes

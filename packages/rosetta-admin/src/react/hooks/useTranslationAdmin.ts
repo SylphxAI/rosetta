@@ -127,7 +127,10 @@ export function useTranslationAdmin(): UseTranslationAdminReturn {
 	const enterEditor = useCallback((locale: string) => store.enterEditor(locale), [store]);
 	const exitEditor = useCallback(() => store.exitEditor(), [store]);
 	const setSearchQuery = useCallback((query: string) => store.setSearchQuery(query), [store]);
-	const setStatusFilter = useCallback((filter: StatusFilter) => store.setStatusFilter(filter), [store]);
+	const setStatusFilter = useCallback(
+		(filter: StatusFilter) => store.setStatusFilter(filter),
+		[store]
+	);
 	const setEditingHash = useCallback((hash: string | null) => store.setEditingHash(hash), [store]);
 	const saveTranslation = useCallback(
 		(sourceHash: string, translatedText: string, locale?: string) =>
@@ -145,7 +148,10 @@ export function useTranslationAdmin(): UseTranslationAdminReturn {
 	const addLocale = useCallback((locale: string) => store.addLocale(locale), [store]);
 	const removeLocale = useCallback((locale: string) => store.removeLocale(locale), [store]);
 	const refresh = useCallback(() => store.fetchData(), [store]);
-	const getLocaleProgress = useCallback((locale: string) => store.getLocaleProgress(locale), [store]);
+	const getLocaleProgress = useCallback(
+		(locale: string) => store.getLocaleProgress(locale),
+		[store]
+	);
 	const getOutdatedCount = useCallback((locale: string) => store.getOutdatedCount(locale), [store]);
 	const getUntranslatedSources = useCallback(() => store.getUntranslatedSources(), [store]);
 

@@ -4,7 +4,15 @@
  * React context for translation admin
  */
 
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import {
+	createContext,
+	useContext,
+	useEffect,
+	useMemo,
+	useState,
+	type JSX,
+	type ReactNode,
+} from 'react';
 import type { AdminAPIClient } from '../core/types';
 import { createAdminStore, type AdminStore } from '../core/store';
 
@@ -25,7 +33,10 @@ export interface TranslationAdminProviderProps {
 /**
  * Provider for translation admin hooks
  */
-export function TranslationAdminProvider({ children, client }: TranslationAdminProviderProps) {
+export function TranslationAdminProvider({
+	children,
+	client,
+}: TranslationAdminProviderProps): JSX.Element {
 	const store = useMemo(() => createAdminStore(client), [client]);
 
 	// Fetch data on mount

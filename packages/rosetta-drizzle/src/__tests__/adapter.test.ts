@@ -9,10 +9,7 @@ import { describe, expect, test } from 'bun:test';
 import { Database } from 'bun:sqlite';
 import { drizzle } from 'drizzle-orm/bun-sqlite';
 import { DrizzleStorageAdapter } from '../adapter';
-import {
-	sqliteRosettaSources,
-	sqliteRosettaTranslations,
-} from '../schema';
+import { sqliteRosettaSources, sqliteRosettaTranslations } from '../schema';
 
 // ============================================
 // Test Setup
@@ -132,10 +129,7 @@ describe('DrizzleStorageAdapter', () => {
 
 			await adapter.saveTranslation('zh-TW', 'hash1', '你好');
 
-			const result = await adapter.getTranslationsByHashes('zh-TW', [
-				'hash1',
-				'nonexistent',
-			]);
+			const result = await adapter.getTranslationsByHashes('zh-TW', ['hash1', 'nonexistent']);
 			expect(result.size).toBe(1);
 			expect(result.get('hash1')).toBe('你好');
 		});

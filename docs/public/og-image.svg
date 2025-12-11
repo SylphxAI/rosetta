@@ -1,0 +1,28 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#0f172a"/>
+
+  <!-- Grid pattern -->
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <!-- Logo circle -->
+  <circle cx="600" cy="200" r="80" stroke="#10b981" stroke-width="6" fill="none"/>
+  <text x="600" y="225" text-anchor="middle" font-family="system-ui, sans-serif" font-size="64" font-weight="bold" fill="white">R</text>
+  <circle cx="660" cy="140" r="16" fill="#10b981"/>
+
+  <!-- Title -->
+  <text x="600" y="340" text-anchor="middle" font-family="system-ui, sans-serif" font-size="72" font-weight="bold" fill="white">Rosetta</text>
+
+  <!-- Tagline -->
+  <text x="600" y="400" text-anchor="middle" font-family="system-ui, sans-serif" font-size="28" fill="#94a3b8">LLM-powered i18n for Next.js App Router</text>
+
+  <!-- Features -->
+  <text x="600" y="480" text-anchor="middle" font-family="system-ui, sans-serif" font-size="20" fill="#64748b">Write English in code • Generate translations with AI • Ship globally</text>
+
+  <!-- Brand -->
+  <text x="600" y="580" text-anchor="middle" font-family="system-ui, sans-serif" font-size="18" fill="#475569">sylphx.com</text>
+</svg>

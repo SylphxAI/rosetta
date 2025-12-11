@@ -116,7 +116,12 @@ interface TranslationResponse {
  * Create an OpenRouter-based translator
  */
 export function createOpenRouterTranslator(config: OpenRouterTranslatorConfig): TranslateFunction {
-	const { apiKey, model, batchSize = DEFAULT_BATCH_SIZE, systemPrompt = defaultSystemPrompt } = config;
+	const {
+		apiKey,
+		model,
+		batchSize = DEFAULT_BATCH_SIZE,
+		systemPrompt = defaultSystemPrompt,
+	} = config;
 
 	const openRouter = new OpenRouter({ apiKey });
 
@@ -163,7 +168,12 @@ export function createOpenRouterTranslator(config: OpenRouterTranslatorConfig): 
 			if (!firstContent) {
 				throw new Error('Empty response content from OpenRouter');
 			}
-			const text = typeof firstContent === 'string' ? firstContent : 'text' in firstContent ? firstContent.text : '';
+			const text =
+				typeof firstContent === 'string'
+					? firstContent
+					: 'text' in firstContent
+						? firstContent.text
+						: '';
 
 			const parsed = JSON.parse(text) as TranslationResponse;
 

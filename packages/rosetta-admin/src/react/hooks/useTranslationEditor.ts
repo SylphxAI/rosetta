@@ -78,7 +78,9 @@ export interface UseTranslationEditorReturn {
  * }
  * ```
  */
-export function useTranslationEditor(options: UseTranslationEditorOptions = {}): UseTranslationEditorReturn {
+export function useTranslationEditor(
+	options: UseTranslationEditorOptions = {}
+): UseTranslationEditorReturn {
 	const store = useAdminStore();
 	const [isSaving, setIsSaving] = useState(false);
 	const [saveError, setSaveError] = useState<string | null>(null);
@@ -90,7 +92,10 @@ export function useTranslationEditor(options: UseTranslationEditorOptions = {}):
 
 	// Actions
 	const setSearchQuery = useCallback((query: string) => store.setSearchQuery(query), [store]);
-	const setStatusFilter = useCallback((filter: StatusFilter) => store.setStatusFilter(filter), [store]);
+	const setStatusFilter = useCallback(
+		(filter: StatusFilter) => store.setStatusFilter(filter),
+		[store]
+	);
 	const startEditing = useCallback((hash: string) => store.setEditingHash(hash), [store]);
 	const cancelEditing = useCallback(() => store.setEditingHash(null), [store]);
 

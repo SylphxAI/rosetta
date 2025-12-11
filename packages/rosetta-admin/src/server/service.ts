@@ -40,7 +40,9 @@ export interface AdminService {
 	saveTranslation: (data: SaveTranslationRequest) => Promise<void>;
 	markAsReviewed: (data: MarkAsReviewedRequest) => Promise<void>;
 	batchTranslate: (data: BatchTranslateRequest) => Promise<BatchTranslateResponse>;
-	batchTranslateStream: (data: BatchTranslateRequest) => AsyncGenerator<BatchStreamEvent, void, unknown>;
+	batchTranslateStream: (
+		data: BatchTranslateRequest
+	) => AsyncGenerator<BatchStreamEvent, void, unknown>;
 }
 
 /**
@@ -78,7 +80,10 @@ export function createAdminService(config: AdminServiceConfig): AdminService {
 	 */
 	function getEffectiveSourceText(
 		codeText: string,
-		translations: Record<string, { text: string | null; sourceHash?: string | null; translatedFrom?: string | null } | null>
+		translations: Record<
+			string,
+			{ text: string | null; sourceHash?: string | null; translatedFrom?: string | null } | null
+		>
 	): string {
 		const enOverride = translations['en']?.text;
 		return enOverride || codeText;
@@ -89,7 +94,11 @@ export function createAdminService(config: AdminServiceConfig): AdminService {
 	 * Uses sourceHash (preferred) or falls back to translatedFrom (deprecated)
 	 */
 	function isTranslationOutdated(
-		translation: { text: string | null; sourceHash?: string | null; translatedFrom?: string | null } | null,
+		translation: {
+			text: string | null;
+			sourceHash?: string | null;
+			translatedFrom?: string | null;
+		} | null,
 		effectiveSource: string
 	): boolean {
 		if (!translation?.text) {
@@ -134,9 +143,7 @@ export function createAdminService(config: AdminServiceConfig): AdminService {
 			totalStrings = manifestSources.length;
 
 			// Build a map of hash -> translations for quick lookup
-			const translationsMap = new Map(
-				translationsData.map((src) => [src.hash, src.translations])
-			);
+			const translationsMap = new Map(translationsData.map((src) => [src.hash, src.translations]));
 
 			// Join manifest sources with translations from DB
 			sources = manifestSources.map((source) => {
@@ -397,7 +404,10 @@ export function createAdminService(config: AdminServiceConfig): AdminService {
 				}
 			}
 		} catch (err) {
-			yield { type: 'error', message: err instanceof Error ? err.message : 'Failed to get sources' };
+			yield {
+				type: 'error',
+				message: err instanceof Error ? err.message : 'Failed to get sources',
+			};
 			return;
 		}
 
@@ -477,4 +487,3 @@ export function createAdminService(config: AdminServiceConfig): AdminService {
 		batchTranslateStream: batchTranslateStream,
 	};
 }
-
