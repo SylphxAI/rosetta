@@ -29,7 +29,14 @@
 
 import type { StorageAdapter } from '@sylphx/rosetta';
 import { TRPCError, initTRPC } from '@trpc/server';
-import { z, type ZodObject, type ZodString, type ZodOptional, type ZodBoolean, type ZodArray } from 'zod';
+import {
+	type ZodArray,
+	type ZodBoolean,
+	type ZodObject,
+	type ZodOptional,
+	type ZodString,
+	z,
+} from 'zod';
 import type { TranslateFunction } from '../core/types';
 import { type AdminServiceConfig, createAdminService } from './service';
 
@@ -82,7 +89,9 @@ export interface CreateAdminRouterConfig extends AdminServiceConfig {
  * Create tRPC router for translation admin
  */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export function createAdminRouter(config: CreateAdminRouterConfig): ReturnType<ReturnType<typeof initTRPC.create>['router']> {
+export function createAdminRouter(
+	config: CreateAdminRouterConfig
+): ReturnType<ReturnType<typeof initTRPC.create>['router']> {
 	const { t: customT, ...serviceConfig } = config;
 
 	// Use custom tRPC or create a basic one
