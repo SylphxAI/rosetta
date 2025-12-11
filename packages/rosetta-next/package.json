@@ -33,7 +33,7 @@
 	],
 	"scripts": {
 		"build": "NODE_ENV=production bunup src/locales.ts --format esm --dts --external react --external @sylphx/rosetta --splitting=false && bunup src/index.tsx src/server.tsx --format esm --dts --external react --external @sylphx/rosetta --jsx.runtime automatic --jsx.import-source react --no-clean --splitting=false && bunup src/loader.ts src/sync.ts --format esm,cjs --dts --external react --external @sylphx/rosetta --no-clean --splitting=false && bun run build:fix",
-		"build:fix": "find dist -name '*.js' -exec sed -i '' 's/jsx-dev-runtime/jsx-runtime/g; s/jsxDEV/jsx/g' {} \\; && for f in dist/index.js dist/server.js dist/locales.js; do [ -f \"$f\" ] && sed -i '' '/^import { createRequire } from \"node:module\";$/d; /^var __require = \\/\\* @__PURE__ \\*\\/ createRequire(import.meta.url);$/d' \"$f\"; done",
+		"build:fix": "find dist -name '*.js' -exec sed -i.bak 's/jsx-dev-runtime/jsx-runtime/g; s/jsxDEV/jsx/g' {} \\; && for f in dist/index.js dist/server.js dist/locales.js; do [ -f \"$f\" ] && sed -i.bak '/^import { createRequire } from \"node:module\";$/d; /^var __require = \\/\\* @__PURE__ \\*\\/ createRequire(import.meta.url);$/d' \"$f\"; done && find dist -name '*.bak' -delete",
 		"dev": "bunup src/index.tsx src/server.tsx src/loader.ts src/sync.ts --format esm --dts --external react --external @sylphx/rosetta --watch",
 		"test": "bun test",
 		"typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.node.json",
