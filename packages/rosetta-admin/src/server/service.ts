@@ -34,10 +34,19 @@ export interface AdminServiceConfig {
 	getManifestSources?: () => Promise<Array<{ hash: string; text: string; context?: string }>>;
 }
 
+export interface AdminService {
+	getActiveLocales: () => Promise<string[]>;
+	fetchTranslations: (locale: string) => Promise<FetchTranslationsResponse>;
+	saveTranslation: (data: SaveTranslationRequest) => Promise<void>;
+	markAsReviewed: (data: MarkAsReviewedRequest) => Promise<void>;
+	batchTranslate: (data: BatchTranslateRequest) => Promise<BatchTranslateResponse>;
+	batchTranslateStream: (data: BatchTranslateRequest) => AsyncGenerator<BatchStreamEvent, void, unknown>;
+}
+
 /**
  * Create admin service with business logic
  */
-export function createAdminService(config: AdminServiceConfig) {
+export function createAdminService(config: AdminServiceConfig): AdminService {
 	const { storage, translator, getEnabledLocales, batchSize = 30, getManifestSources } = config;
 
 	/**
@@ -469,4 +478,3 @@ export function createAdminService(config: AdminServiceConfig) {
 	};
 }
 
-export type AdminService = ReturnType<typeof createAdminService>;

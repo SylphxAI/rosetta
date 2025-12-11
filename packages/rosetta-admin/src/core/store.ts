@@ -15,10 +15,30 @@ import { getTranslationStatus, initialAdminState } from './types';
 
 type Listener = () => void;
 
+export interface AdminStore {
+	getState: () => AdminState;
+	subscribe: (listener: Listener) => () => void;
+	getFilteredSources: () => SourceEntry[];
+	getLocaleProgress: (locale: string) => number;
+	getOutdatedCount: (locale: string) => number;
+	getUntranslatedSources: (locale: string) => SourceEntry[];
+	fetchData: () => Promise<void>;
+	enterEditor: (locale: string) => void;
+	exitEditor: () => void;
+	setSearchQuery: (query: string) => void;
+	setStatusFilter: (filter: StatusFilter) => void;
+	setEditingHash: (hash: string | null) => void;
+	saveTranslation: (hash: string, text: string) => Promise<void>;
+	markAsReviewed: (hash: string) => Promise<void>;
+	batchTranslate: (locale: string, hashes: string[]) => Promise<void>;
+	addLocale: (locale: string) => Promise<void>;
+	removeLocale: (locale: string) => Promise<void>;
+}
+
 /**
  * Create a vanilla admin store
  */
-export function createAdminStore(client: AdminAPIClient) {
+export function createAdminStore(client: AdminAPIClient): AdminStore {
 	let state: AdminState = { ...initialAdminState };
 	const listeners = new Set<Listener>();
 
@@ -452,4 +472,3 @@ export function createAdminStore(client: AdminAPIClient) {
 	};
 }
 
-export type AdminStore = ReturnType<typeof createAdminStore>;
