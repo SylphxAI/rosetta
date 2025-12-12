@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5.7 (2025-12-12)
+
+### 🐛 Bug Fixes
+
+- **rosetta:** use target node for server build to preserve AsyncLocalStorage ([14fd99a](https://github.com/SylphxAI/rosetta/commit/14fd99ae7246bd4586b89369558f2789c4ffa4e4))
+
+### 💅 Styles
+
+- format package.json files ([2ac26e7](https://github.com/SylphxAI/rosetta/commit/2ac26e7827ee02ad0874dc1c2f92ec26a3a40140))
+
 ## 0.5.6 (2025-12-12)
 
 ### 🐛 Bug Fixes

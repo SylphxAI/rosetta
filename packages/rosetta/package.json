@@ -1,6 +1,6 @@
 {
 	"name": "@sylphx/rosetta",
-	"version": "0.5.6",
+	"version": "0.5.7",
 	"description": "Lightweight i18n library with LLM-powered translation generation",
 	"license": "MIT",
 	"type": "module",
@@ -30,7 +30,9 @@
 	"bin": {
 		"rosetta": "./dist/cli/index.js"
 	},
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"scripts": {
 		"build": "bunup src/index.ts --dts --format esm,cjs --target browser && bunup src/server/index.ts --dts --clean=false --splitting=false --target node --out-dir dist/server && bunup src/icu.ts --dts --clean=false --splitting=false --target browser && bunup src/adapters/index.ts src/cli/index.ts --dts --clean=false --splitting=false --target node",
 		"dev": "bunup src/index.ts src/server/index.ts src/adapters/index.ts src/icu.ts --dts --watch",
