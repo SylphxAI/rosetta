@@ -1,6 +1,6 @@
 {
 	"name": "@sylphx/rosetta-next",
-	"version": "0.3.5",
+	"version": "0.3.6",
 	"description": "Next.js integration for @sylphx/rosetta i18n",
 	"license": "MIT",
 	"type": "module",
@@ -28,7 +28,9 @@
 			"require": "./dist/sync.cjs"
 		}
 	},
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"scripts": {
 		"build": "NODE_ENV=production bunup src/locales.ts --format esm --dts --external react --external @sylphx/rosetta --splitting=false --target browser && bunup src/index.tsx src/server.tsx --format esm --dts --external react --external @sylphx/rosetta --jsx.runtime automatic --jsx.import-source react --no-clean --splitting=false --target browser && bunup src/loader.ts src/sync.ts --format esm,cjs --dts --external react --external @sylphx/rosetta --no-clean --splitting=false --target node && bun run build:fix",
 		"build:fix": "find dist -name '*.js' -exec sed -i.bak 's/jsx-dev-runtime/jsx-runtime/g; s/jsxDEV/jsx/g' {} \\; && find dist -name '*.bak' -delete",

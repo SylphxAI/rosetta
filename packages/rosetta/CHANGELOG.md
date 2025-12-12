@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.5.6 (2025-12-12)
+
+### 🐛 Bug Fixes
+
+- add biome-ignore comments for noExplicitAny lint errors ([dcf99d8](https://github.com/SylphxAI/rosetta/commit/dcf99d83b7ae92ba709c32a5d7e2be1cfebde137))
+- resolve TypeScript type errors and exclude test files from typecheck ([46f3222](https://github.com/SylphxAI/rosetta/commit/46f32221b9c22fa82b73c37dd63880aa85c754fe))
+- resolve biome lint errors ([619969b](https://github.com/SylphxAI/rosetta/commit/619969b119a2827e54d327c5bc907f585c81b442))
+
+### 💅 Styles
+
+- format package.json files ([f26787d](https://github.com/SylphxAI/rosetta/commit/f26787d55f657f22eb764651104feb775f7a98db))
+
+### ✅ Tests
+
+- add comprehensive tests to improve coverage to >95% ([ac23a71](https://github.com/SylphxAI/rosetta/commit/ac23a71af4f68ad11b89e2b2b2e5ecdeea944b06))
+
 ## 0.5.5 (2025-12-11)
 
 ### 🐛 Bug Fixes

@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.3.6 (2025-12-12)
+
+### 🐛 Bug Fixes
+
+- **rosetta-admin:** add explicit types for zod schemas and router for isolatedDeclarations ([e90dda0](https://github.com/SylphxAI/rosetta/commit/e90dda019d9bbb831d349f651724d4d81a373b5d))
+- resolve TypeScript type errors and exclude test files from typecheck ([46f3222](https://github.com/SylphxAI/rosetta/commit/46f32221b9c22fa82b73c37dd63880aa85c754fe))
+- resolve biome lint errors ([619969b](https://github.com/SylphxAI/rosetta/commit/619969b119a2827e54d327c5bc907f585c81b442))
+- **rosetta-admin:** add explicit return types for isolatedDeclarations ([d4c4924](https://github.com/SylphxAI/rosetta/commit/d4c4924c33e895bd60837d2c38e6bd479f32c157))
+- **rosetta-admin:** use explicit key:value syntax for isolatedDeclarations ([7ee3431](https://github.com/SylphxAI/rosetta/commit/7ee3431ab67d073089bb4cdafc01be2dae1ac3e4))
+
+### ♻️ Refactoring
+
+- **rosetta-admin:** migrate from tsup to bunup ([3cc3dda](https://github.com/SylphxAI/rosetta/commit/3cc3dda6ac981c773e565b5bdc191313619eb98c))
+
+### 💅 Styles
+
+- fix import organization in trpc.ts ([999e8cf](https://github.com/SylphxAI/rosetta/commit/999e8cf9f9c6a7434fddbfcf51ec7a20b7f27ed8))
+- format package.json files ([f26787d](https://github.com/SylphxAI/rosetta/commit/f26787d55f657f22eb764651104feb775f7a98db))
+
 ## 0.3.5 (2025-12-11)
 
 ### 📦 Dependencies
