@@ -22,9 +22,7 @@
 			"import": "./dist/server/trpc.js"
 		}
 	},
-	"files": [
-		"dist"
-	],
+	"files": ["dist"],
 	"scripts": {
 		"build": "bunup src/index.ts --format esm --dts --external react --external @sylphx/rosetta --splitting=false --target browser && bunup src/react/index.ts --format esm --dts --external react --external @sylphx/rosetta --no-clean --splitting=false --target browser --out-dir dist/react && bunup src/server/index.ts src/server/trpc.ts --format esm --dts --external react --external @sylphx/rosetta --external @trpc/server --external zod --no-clean --splitting=false --target node --out-dir dist/server",
 		"dev": "bunup src/index.ts src/react/index.ts src/server/index.ts src/server/trpc.ts --format esm --dts --external react --external @sylphx/rosetta --watch",
@@ -71,12 +69,5 @@
 	"bugs": {
 		"url": "https://github.com/SylphxAI/rosetta/issues"
 	},
-	"keywords": [
-		"i18n",
-		"translation",
-		"admin",
-		"rosetta",
-		"headless",
-		"react-hooks"
-	]
+	"keywords": ["i18n", "translation", "admin", "rosetta", "headless", "react-hooks"]
 }

@@ -56,8 +56,7 @@ export interface RosettaPluginOptions {
 }
 
 // Use permissive types for NextConfig to avoid conflicts with Next.js types
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type NextConfig = Record<string, any>;
+type NextConfig = Record<string, unknown>;
 
 /**
  * @deprecated Use CLI extraction instead. See module docs for migration guide.

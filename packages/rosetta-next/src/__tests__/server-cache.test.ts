@@ -4,12 +4,12 @@
  * Tests for InMemoryCache, ExternalCache, and RequestScopedCache.
  */
 
-import { describe, expect, test, beforeEach, mock } from 'bun:test';
+import { beforeEach, describe, expect, mock, test } from 'bun:test';
 import {
-	InMemoryCache,
 	ExternalCache,
-	RequestScopedCache,
+	InMemoryCache,
 	type RedisLikeClient,
+	RequestScopedCache,
 } from '../server/cache';
 
 // ============================================
@@ -19,7 +19,10 @@ import {
 describe('InMemoryCache', () => {
 	test('stores and retrieves translations', async () => {
 		const cache = new InMemoryCache();
-		const translations = new Map([['abc', 'Hello'], ['def', 'World']]);
+		const translations = new Map([
+			['abc', 'Hello'],
+			['def', 'World'],
+		]);
 
 		await cache.set('en', translations);
 		const result = await cache.get('en');
@@ -144,7 +147,10 @@ describe('ExternalCache', () => {
 		const redis = createMockRedis();
 		const cache = new ExternalCache(redis);
 
-		const translations = new Map([['abc', 'Hello'], ['def', 'World']]);
+		const translations = new Map([
+			['abc', 'Hello'],
+			['def', 'World'],
+		]);
 		await cache.set('en', translations);
 
 		const result = await cache.get('en');

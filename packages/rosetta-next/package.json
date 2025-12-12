@@ -61,5 +61,13 @@
 	"bugs": {
 		"url": "https://github.com/SylphxAI/rosetta/issues"
 	},
-	"keywords": ["i18n", "nextjs", "next", "translation", "rosetta", "app-router", "server-components"]
+	"keywords": [
+		"i18n",
+		"nextjs",
+		"next",
+		"translation",
+		"rosetta",
+		"app-router",
+		"server-components"
+	]
 }

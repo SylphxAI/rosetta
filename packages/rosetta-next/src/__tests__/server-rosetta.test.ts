@@ -4,9 +4,9 @@
  * Tests for the server-side Rosetta manager.
  */
 
-import { describe, expect, test, beforeEach, mock } from 'bun:test';
-import { createRosetta, Rosetta } from '../server/rosetta';
+import { beforeEach, describe, expect, mock, test } from 'bun:test';
 import type { StorageAdapter, TranslateAdapter } from '@sylphx/rosetta';
+import { Rosetta, createRosetta } from '../server/rosetta';
 
 // ============================================
 // Mock Storage Adapter
@@ -22,11 +22,26 @@ function createMockStorage(data?: {
 		{ id: '3', text: 'Goodbye', hash: 'ghi789' },
 	];
 
-	const translations = data?.translations ?? new Map([
-		['en', new Map([['abc123', 'Hello'], ['def456', 'World'], ['ghi789', 'Goodbye']])],
-		['zh-TW', new Map([['abc123', '你好'], ['def456', '世界']])],
-		['zh', new Map([['abc123', '你好 (简)']])],
-	]);
+	const translations =
+		data?.translations ??
+		new Map([
+			[
+				'en',
+				new Map([
+					['abc123', 'Hello'],
+					['def456', 'World'],
+					['ghi789', 'Goodbye'],
+				]),
+			],
+			[
+				'zh-TW',
+				new Map([
+					['abc123', '你好'],
+					['def456', '世界'],
+				]),
+			],
+			['zh', new Map([['abc123', '你好 (简)']])],
+		]);
 
 	const savedTranslations: Array<{ locale: string; hash: string; text: string }> = [];
 
@@ -399,8 +414,8 @@ describe('Rosetta', () => {
 
 			const exported = await rosetta.exportTranslations('zh-TW');
 
-			expect(exported['Hello']).toBe('你好');
-			expect(exported['World']).toBe('世界');
+			expect(exported.Hello).toBe('你好');
+			expect(exported.World).toBe('世界');
 		});
 	});
 

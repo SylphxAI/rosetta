@@ -43,7 +43,11 @@
  */
 
 // Server Provider
-export { RosettaProvider, type RosettaProviderProps, type RosettaManifest } from './server-provider';
+export {
+	RosettaProvider,
+	type RosettaProviderProps,
+	type RosettaManifest,
+} from './server-provider';
 
 // Rosetta instance factory
 export { createRosetta, Rosetta } from './server/rosetta';

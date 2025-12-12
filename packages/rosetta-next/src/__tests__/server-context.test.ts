@@ -4,19 +4,19 @@
  * Tests for AsyncLocalStorage-based context management.
  */
 
-import { describe, expect, test, beforeEach, mock } from 'bun:test';
+import { beforeEach, describe, expect, mock, test } from 'bun:test';
 import {
-	rosettaStorage,
-	t,
-	getTranslationsAsync,
-	getLocale,
-	getDefaultLocale,
-	getLocaleChain,
-	getTranslationsForClient,
-	runWithRosetta,
-	getRosettaContext,
-	isInsideRosettaContext,
 	type RunWithRosettaOptions,
+	getDefaultLocale,
+	getLocale,
+	getLocaleChain,
+	getRosettaContext,
+	getTranslationsAsync,
+	getTranslationsForClient,
+	isInsideRosettaContext,
+	rosettaStorage,
+	runWithRosetta,
+	t,
 } from '../server/context';
 
 // ============================================
@@ -25,8 +25,20 @@ import {
 
 function createMockStorage() {
 	const translations = new Map<string, Map<string, string>>([
-		['en', new Map([['abc123', 'Hello'], ['def456', 'World']])],
-		['zh-TW', new Map([['abc123', '你好'], ['def456', '世界']])],
+		[
+			'en',
+			new Map([
+				['abc123', 'Hello'],
+				['def456', 'World'],
+			]),
+		],
+		[
+			'zh-TW',
+			new Map([
+				['abc123', '你好'],
+				['def456', '世界'],
+			]),
+		],
 	]);
 
 	return {

@@ -26,9 +26,7 @@
 	"bin": {
 		"rosetta": "./dist/cli/index.js"
 	},
-	"files": [
-		"dist"
-	],
+	"files": ["dist"],
 	"scripts": {
 		"build": "bunup src/index.ts --dts --format esm,cjs --target browser && bunup src/icu.ts --dts --clean=false --splitting=false --target browser && bunup src/adapters/index.ts src/cli/index.ts --dts --clean=false --splitting=false --target node",
 		"dev": "bunup src/index.ts src/icu.ts src/adapters/index.ts --dts --watch",
@@ -61,5 +59,12 @@
 	"bugs": {
 		"url": "https://github.com/SylphxAI/rosetta/issues"
 	},
-	"keywords": ["i18n", "internationalization", "translation", "localization", "llm", "ai-translation"]
+	"keywords": [
+		"i18n",
+		"internationalization",
+		"translation",
+		"localization",
+		"llm",
+		"ai-translation"
+	]
 }

@@ -50,7 +50,8 @@ describe('withRosetta', () => {
 		config.webpack(mockConfig, {});
 
 		expect(mockConfig.module.rules.length).toBe(1);
-		expect((mockConfig.module.rules[0] as any).test.toString()).toContain('tsx');
+		const rule = mockConfig.module.rules[0] as { test: RegExp };
+		expect(rule.test.toString()).toContain('tsx');
 	});
 
 	test('calls existing webpack config', () => {

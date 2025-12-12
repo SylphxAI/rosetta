@@ -5,13 +5,13 @@
  */
 
 import { describe, expect, test } from 'bun:test';
-import type { Rosetta } from '../server/rosetta';
 import {
 	type LocaleConfig,
 	buildLocaleCookie,
 	getReadyLocales,
 	parseLocaleCookie,
 } from '../locale';
+import type { Rosetta } from '../server/rosetta';
 
 // ============================================
 // Mock Rosetta

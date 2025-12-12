@@ -413,19 +413,17 @@ describe('route manifest', () => {
 		process.env.ROSETTA_MANIFEST_DIR = '.rosetta-test';
 
 		// Simulate loader being called with file context
-		// biome-ignore lint/suspicious/noExplicitAny: webpack loader context mock
 		const loaderWithContext = rosettaLoader.bind({
 			resourcePath: '/project/app/products/page.tsx',
-		} as any);
+		} as { resourcePath: string });
 		loaderWithContext(`
 			const x = t('Product Title');
 			const y = t('Add to Cart');
 		`);
 
-		// biome-ignore lint/suspicious/noExplicitAny: webpack loader context mock
 		const homeLoader = rosettaLoader.bind({
 			resourcePath: '/project/app/page.tsx',
-		} as any);
+		} as { resourcePath: string });
 		homeLoader(`
 			const a = t('Welcome');
 			const b = t('Product Title'); // Shared with products
@@ -455,17 +453,15 @@ describe('route manifest', () => {
 		process.env.ROSETTA_MANIFEST_DIR = '.rosetta-test';
 
 		// Simulate shared component
-		// biome-ignore lint/suspicious/noExplicitAny: webpack loader context mock
 		const sharedLoader = rosettaLoader.bind({
 			resourcePath: '/project/src/components/Header.tsx',
-		} as any);
+		} as { resourcePath: string });
 		sharedLoader(`t('Navigation')`);
 
 		// Route-specific
-		// biome-ignore lint/suspicious/noExplicitAny: webpack loader context mock
 		const pageLoader = rosettaLoader.bind({
 			resourcePath: '/project/app/about/page.tsx',
-		} as any);
+		} as { resourcePath: string });
 		pageLoader(`t('About Us')`);
 
 		flushManifest();

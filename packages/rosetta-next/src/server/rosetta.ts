@@ -6,19 +6,19 @@
 
 import {
 	type CacheAdapter,
-	type StorageAdapter,
-	type TranslateAdapter,
+	DEFAULT_LOCALE,
 	type SourceString,
 	type SourceWithStatus,
+	type StorageAdapter,
+	type TranslateAdapter,
 	type TranslationStats,
-	buildLocaleChain,
-	isValidLocale,
-	hashText,
 	assertValidContext,
 	assertValidHash,
 	assertValidLocale,
 	assertValidText,
-	DEFAULT_LOCALE,
+	buildLocaleChain,
+	hashText,
+	isValidLocale,
 } from '@sylphx/rosetta';
 import { runWithRosetta } from './context';
 
@@ -263,7 +263,11 @@ export class Rosetta {
 		return this.storage.getUntranslated(locale);
 	}
 
-	async generateTranslation(text: string, targetLocale: string, context?: string): Promise<string | null> {
+	async generateTranslation(
+		text: string,
+		targetLocale: string,
+		context?: string
+	): Promise<string | null> {
 		if (!this.translator) {
 			throw new Error('No translator adapter configured');
 		}
@@ -284,7 +288,11 @@ export class Rosetta {
 		}
 	}
 
-	async generateAndSave(text: string, targetLocale: string, context?: string): Promise<string | null> {
+	async generateAndSave(
+		text: string,
+		targetLocale: string,
+		context?: string
+	): Promise<string | null> {
 		const translation = await this.generateTranslation(text, targetLocale, context);
 
 		if (translation) {
@@ -309,7 +317,11 @@ export class Rosetta {
 
 		for (let i = 0; i < untranslated.length; i++) {
 			const source = untranslated[i]!;
-			const translation = await this.generateAndSave(source.text, targetLocale, source.context ?? undefined);
+			const translation = await this.generateAndSave(
+				source.text,
+				targetLocale,
+				source.context ?? undefined
+			);
 
 			if (translation) {
 				success++;
@@ -323,7 +335,12 @@ export class Rosetta {
 		return { success, failed };
 	}
 
-	async saveTranslation(locale: string, text: string, translation: string, context?: string): Promise<void> {
+	async saveTranslation(
+		locale: string,
+		text: string,
+		translation: string,
+		context?: string
+	): Promise<void> {
 		assertValidLocale(locale);
 		assertValidText(text, 'source text');
 		assertValidText(translation, 'translation');

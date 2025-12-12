@@ -7,14 +7,14 @@
 
 import { AsyncLocalStorage } from 'node:async_hooks';
 import {
+	DEFAULT_LOCALE,
+	type PluralRulesCache,
 	type RosettaContext,
 	type TranslateOptions,
 	buildLocaleChain,
+	createPluralRulesCache,
 	formatMessage,
 	hashText,
-	createPluralRulesCache,
-	type PluralRulesCache,
-	DEFAULT_LOCALE,
 } from '@sylphx/rosetta';
 
 // ============================================
@@ -65,7 +65,8 @@ export function runWithRosetta<T>(options: RunWithRosettaOptions, fn: () => T): 
 	}
 
 	// Build locale chain if not provided
-	const localeChain = options.localeChain ?? buildLocaleChain(options.locale, options.defaultLocale);
+	const localeChain =
+		options.localeChain ?? buildLocaleChain(options.locale, options.defaultLocale);
 
 	// Create context
 	const fullContext: RosettaContext = {
