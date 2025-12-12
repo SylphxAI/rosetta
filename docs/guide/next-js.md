@@ -76,7 +76,7 @@ export default async function LocaleLayout({
 
 ```tsx
 // app/[locale]/page.tsx
-import { t } from '@sylphx/rosetta/server';
+import { t } from '@sylphx/rosetta-next/server';
 
 export default function HomePage() {
   return (
@@ -91,7 +91,7 @@ export default function HomePage() {
 ### With Parameters
 
 ```tsx
-import { t } from '@sylphx/rosetta/server';
+import { t } from '@sylphx/rosetta-next/server';
 
 export default async function ProfilePage({
   params,
@@ -112,7 +112,7 @@ export default async function ProfilePage({
 ### With Context for Disambiguation
 
 ```tsx
-import { t } from '@sylphx/rosetta/server';
+import { t } from '@sylphx/rosetta-next/server';
 
 export default function SettingsPage() {
   return (
@@ -246,7 +246,7 @@ export const config = {
 
 ```tsx
 // app/[locale]/page.tsx
-import { t } from '@sylphx/rosetta/server';
+import { t } from '@sylphx/rosetta-next/server';
 import type { Metadata } from 'next';
 
 export async function generateMetadata({
@@ -318,7 +318,7 @@ export default async function DashboardLayout({
 // app/actions.ts
 'use server';
 
-import { t, getLocale } from '@sylphx/rosetta/server';
+import { t, getLocale } from '@sylphx/rosetta-next/server';
 
 export async function submitForm(formData: FormData) {
   const locale = getLocale();

@@ -367,7 +367,7 @@ CREATE UNIQUE INDEX idx_translations_locale_hash ON translations(locale, hash);
 Wrap your adapter with caching:
 
 ```ts
-import { InMemoryCache } from '@sylphx/rosetta/server';
+import { InMemoryCache } from '@sylphx/rosetta-next/server';
 
 const cache = new InMemoryCache({ ttlMs: 60000 });
 

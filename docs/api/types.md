@@ -402,7 +402,7 @@ import type {
   Rosetta,
   RosettaContext,
   TranslateFunction,
-} from '@sylphx/rosetta/server';
+} from '@sylphx/rosetta-next/server';
 
 // Next.js
 import type {

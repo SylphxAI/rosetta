@@ -5,7 +5,7 @@ The translation function for server components.
 ## Import
 
 ```ts
-import { t } from '@sylphx/rosetta/server';
+import { t } from '@sylphx/rosetta-next/server';
 ```
 
 ## Signature
@@ -59,7 +59,7 @@ interface TranslateOptions {
 ### Basic Translation
 
 ```ts
-import { t } from '@sylphx/rosetta/server';
+import { t } from '@sylphx/rosetta-next/server';
 
 function ServerComponent() {
   return <h1>{t("Welcome to our app")}</h1>;
@@ -156,7 +156,7 @@ t("Hello World", { context: "greeting" })
 Get current locale:
 
 ```ts
-import { getLocale } from '@sylphx/rosetta/server';
+import { getLocale } from '@sylphx/rosetta-next/server';
 
 const locale = getLocale();  // "zh-TW"
 ```
@@ -166,7 +166,7 @@ const locale = getLocale();  // "zh-TW"
 Get fallback chain:
 
 ```ts
-import { getLocaleChain } from '@sylphx/rosetta/server';
+import { getLocaleChain } from '@sylphx/rosetta-next/server';
 
 const chain = getLocaleChain();  // ["zh-TW", "zh", "en"]
 ```
@@ -176,7 +176,7 @@ const chain = getLocaleChain();  // ["zh-TW", "zh", "en"]
 Get default locale:
 
 ```ts
-import { getDefaultLocale } from '@sylphx/rosetta/server';
+import { getDefaultLocale } from '@sylphx/rosetta-next/server';
 
 const defaultLocale = getDefaultLocale();  // "en"
 ```
@@ -186,7 +186,7 @@ const defaultLocale = getDefaultLocale();  // "en"
 Check if inside context:
 
 ```ts
-import { isInsideRosettaContext } from '@sylphx/rosetta/server';
+import { isInsideRosettaContext } from '@sylphx/rosetta-next/server';
 
 if (isInsideRosettaContext()) {
   // Safe to use t()
@@ -198,7 +198,7 @@ if (isInsideRosettaContext()) {
 Get full context object:
 
 ```ts
-import { getRosettaContext } from '@sylphx/rosetta/server';
+import { getRosettaContext } from '@sylphx/rosetta-next/server';
 
 const ctx = getRosettaContext();
 // { locale, defaultLocale, localeChain, translations, storage }
@@ -252,7 +252,7 @@ t(`Welcome, ${user.name}!`)  // Won't be extracted!
 ## TypeScript
 
 ```ts
-import type { TranslateFunction, TranslateOptions } from '@sylphx/rosetta/server';
+import type { TranslateFunction, TranslateOptions } from '@sylphx/rosetta-next/server';
 
 // Type-safe usage
 const text: string = t("Hello");

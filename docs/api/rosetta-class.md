@@ -5,7 +5,7 @@ The main entry point for server-side Rosetta operations.
 ## Constructor
 
 ```ts
-import { Rosetta } from '@sylphx/rosetta/server';
+import { Rosetta } from '@sylphx/rosetta-next/server';
 
 const rosetta = new Rosetta(config);
 ```
@@ -104,7 +104,7 @@ const hash = Rosetta.hashText(text, context);
 
 ```ts
 // lib/rosetta/index.ts
-import { Rosetta, InMemoryCache } from '@sylphx/rosetta/server';
+import { Rosetta, InMemoryCache } from '@sylphx/rosetta-next/server';
 import { DrizzleStorageAdapter } from '@sylphx/rosetta-drizzle';
 import { db } from '@/db';
 import { rosettaSources, rosettaTranslations } from '@/db/schema';
@@ -146,7 +146,7 @@ export default async function Layout({ children, params }) {
 ## TypeScript
 
 ```ts
-import type { Rosetta } from '@sylphx/rosetta/server';
+import type { Rosetta } from '@sylphx/rosetta-next/server';
 import type { StorageAdapter, CacheAdapter } from '@sylphx/rosetta';
 
 // Type the rosetta instance

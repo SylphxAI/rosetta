@@ -47,7 +47,7 @@ features:
 
 ```tsx
 // Server Component
-import { t } from '@sylphx/rosetta/server';
+import { t } from '@sylphx/rosetta-next/server';
 
 export function Welcome() {
   return <h1>{t("Welcome to our app")}</h1>;

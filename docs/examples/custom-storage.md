@@ -201,7 +201,7 @@ export class PrismaStorageAdapter implements StorageAdapter {
 
 ```ts
 // lib/rosetta/index.ts
-import { Rosetta } from '@sylphx/rosetta/server';
+import { Rosetta } from '@sylphx/rosetta-next/server';
 import { PrismaClient } from '@prisma/client';
 import { PrismaStorageAdapter } from './prisma-adapter';
 
@@ -464,7 +464,7 @@ CREATE UNIQUE INDEX idx_sources_hash ON sources(hash);
 ### Use Caching
 
 ```ts
-import { InMemoryCache } from '@sylphx/rosetta/server';
+import { InMemoryCache } from '@sylphx/rosetta-next/server';
 
 const rosetta = new Rosetta({
   storage: myAdapter,

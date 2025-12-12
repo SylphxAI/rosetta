@@ -41,7 +41,7 @@ Rosetta works seamlessly with both server and client components:
 
 ```tsx
 // Server Component - uses AsyncLocalStorage
-import { t } from '@sylphx/rosetta/server';
+import { t } from '@sylphx/rosetta-next/server';
 function ServerComponent() {
   return <h1>{t("Hello World")}</h1>;
 }

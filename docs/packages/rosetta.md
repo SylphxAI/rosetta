@@ -13,7 +13,7 @@ bun add @sylphx/rosetta
 | Entry | Description |
 |-------|-------------|
 | `@sylphx/rosetta` | Core utilities (hash, interpolate, types) |
-| `@sylphx/rosetta/server` | Server-side (Rosetta class, t(), context) |
+| `@sylphx/rosetta-next/server` | Server-side (Rosetta class, t(), context) |
 | `@sylphx/rosetta/icu` | ICU MessageFormat parser |
 | `@sylphx/rosetta/cli` | CLI for string extraction |
 
@@ -52,7 +52,7 @@ interpolate("You have {count} items", { count: 5 });
 Main entry point for server-side usage:
 
 ```ts
-import { Rosetta } from '@sylphx/rosetta/server';
+import { Rosetta } from '@sylphx/rosetta-next/server';
 
 const rosetta = new Rosetta({
   storage: drizzleAdapter,
@@ -75,7 +75,7 @@ const defaultLocale = rosetta.getDefaultLocale();
 Translate text within a Rosetta context:
 
 ```ts
-import { t } from '@sylphx/rosetta/server';
+import { t } from '@sylphx/rosetta-next/server';
 
 // Basic usage
 t("Hello World");
@@ -100,7 +100,7 @@ import {
   getRosettaContext,
   isInsideRosettaContext,
   runWithRosetta,
-} from '@sylphx/rosetta/server';
+} from '@sylphx/rosetta-next/server';
 
 // Get current locale
 const locale = getLocale();  // "zh-TW"
@@ -124,7 +124,7 @@ runWithRosetta({ locale: 'ja', translations: new Map() }, () => {
 Build fallback chain for a locale:
 
 ```ts
-import { buildLocaleChain } from '@sylphx/rosetta/server';
+import { buildLocaleChain } from '@sylphx/rosetta-next/server';
 
 buildLocaleChain('zh-TW', 'en');  // ['zh-TW', 'zh', 'en']
 buildLocaleChain('pt-BR', 'en');  // ['pt-BR', 'pt', 'en']
@@ -138,7 +138,7 @@ buildLocaleChain('ja', 'en');     // ['ja', 'en']
 For traditional Node.js servers:
 
 ```ts
-import { InMemoryCache } from '@sylphx/rosetta/server';
+import { InMemoryCache } from '@sylphx/rosetta-next/server';
 
 const cache = new InMemoryCache({
   ttlMs: 5 * 60 * 1000,  // 5 minutes (default)
@@ -151,7 +151,7 @@ const cache = new InMemoryCache({
 For serverless with Redis/Upstash:
 
 ```ts
-import { ExternalCache } from '@sylphx/rosetta/server';
+import { ExternalCache } from '@sylphx/rosetta-next/server';
 import { Redis } from '@upstash/redis';
 
 const redis = new Redis({ url, token });
@@ -166,7 +166,7 @@ const cache = new ExternalCache(redis, {
 For request deduplication:
 
 ```ts
-import { RequestScopedCache } from '@sylphx/rosetta/server';
+import { RequestScopedCache } from '@sylphx/rosetta-next/server';
 
 const requestCache = new RequestScopedCache();
 

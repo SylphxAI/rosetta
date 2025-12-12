@@ -78,7 +78,7 @@ export const storage = new DrizzleStorageAdapter({
 
 ```ts
 // lib/rosetta/index.ts
-import { Rosetta, InMemoryCache } from '@sylphx/rosetta/server';
+import { Rosetta, InMemoryCache } from '@sylphx/rosetta-next/server';
 import { storage } from './storage';
 
 export const rosetta = new Rosetta({
@@ -126,7 +126,7 @@ export function generateStaticParams() {
 
 ```tsx
 // app/[locale]/page.tsx
-import { t } from '@sylphx/rosetta/server';
+import { t } from '@sylphx/rosetta-next/server';
 import { Counter } from '@/components/counter';
 
 export default function HomePage() {

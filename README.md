@@ -151,7 +151,7 @@ export const storage: StorageAdapter = {
 
 ```typescript
 // lib/rosetta/index.ts
-import { Rosetta } from '@sylphx/rosetta/server';
+import { Rosetta } from '@sylphx/rosetta-next/server';
 import { OpenRouterAdapter } from '@sylphx/rosetta/adapters';
 import { cookies } from 'next/headers';
 import { storage } from './storage';
@@ -169,7 +169,7 @@ export const rosetta = new Rosetta({
   },
 });
 
-export { t, flushCollectedStrings, getTranslationsForClient, getLocale } from '@sylphx/rosetta/server';
+export { t, flushCollectedStrings, getTranslationsForClient, getLocale } from '@sylphx/rosetta-next/server';
 ```
 
 ### 4. Set Up Layout
@@ -474,7 +474,7 @@ export function TranslationDashboard() {
 
 ## API Reference
 
-### Server (`@sylphx/rosetta/server`)
+### Server (`@sylphx/rosetta-next/server`)
 
 #### `Rosetta` class
 
@@ -663,7 +663,7 @@ if (lockAcquired) {
 For serverless environments where DB latency matters, use the cache adapters:
 
 ```typescript
-import { Rosetta, ExternalCache } from '@sylphx/rosetta/server';
+import { Rosetta, ExternalCache } from '@sylphx/rosetta-next/server';
 import { Redis } from '@upstash/redis';
 
 const redis = new Redis({ url, token });

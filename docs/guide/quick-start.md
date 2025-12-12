@@ -78,7 +78,7 @@ export const storage = new DrizzleStorageAdapter({
 
 ```ts
 // lib/rosetta/index.ts
-import { Rosetta } from '@sylphx/rosetta/server';
+import { Rosetta } from '@sylphx/rosetta-next/server';
 import { storage } from './storage';
 
 export const rosetta = new Rosetta({
@@ -121,7 +121,7 @@ export default async function LocaleLayout({
 
 ```tsx
 // app/[locale]/page.tsx
-import { t } from '@sylphx/rosetta/server';
+import { t } from '@sylphx/rosetta-next/server';
 
 export default function Home() {
   return (

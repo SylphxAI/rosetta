@@ -20,7 +20,7 @@ interface CacheAdapter {
 Best for traditional Node.js servers:
 
 ```ts
-import { InMemoryCache } from '@sylphx/rosetta/server';
+import { InMemoryCache } from '@sylphx/rosetta-next/server';
 
 const cache = new InMemoryCache({
   ttlMs: 5 * 60 * 1000,  // 5 minutes (default)
@@ -53,7 +53,7 @@ const rosetta = new Rosetta({
 Best for serverless and multi-instance deployments:
 
 ```ts
-import { ExternalCache } from '@sylphx/rosetta/server';
+import { ExternalCache } from '@sylphx/rosetta-next/server';
 import { Redis } from '@upstash/redis';
 
 const redis = new Redis({
@@ -93,7 +93,7 @@ const rosetta = new Rosetta({
 For request-level deduplication:
 
 ```ts
-import { RequestScopedCache } from '@sylphx/rosetta/server';
+import { RequestScopedCache } from '@sylphx/rosetta-next/server';
 
 const requestCache = new RequestScopedCache();
 

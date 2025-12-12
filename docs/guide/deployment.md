@@ -9,7 +9,7 @@ This guide covers production deployment considerations for Rosetta.
 Best for: Self-hosted, Docker, VPS
 
 ```ts
-import { Rosetta, InMemoryCache } from '@sylphx/rosetta/server';
+import { Rosetta, InMemoryCache } from '@sylphx/rosetta-next/server';
 
 const rosetta = new Rosetta({
   storage,
@@ -31,7 +31,7 @@ const rosetta = new Rosetta({
 Best for: Vercel, AWS Lambda, Netlify Functions
 
 ```ts
-import { Rosetta, ExternalCache } from '@sylphx/rosetta/server';
+import { Rosetta, ExternalCache } from '@sylphx/rosetta-next/server';
 import { Redis } from '@upstash/redis';
 
 const redis = new Redis({
