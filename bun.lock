@@ -16,7 +16,7 @@
     },
     "packages/rosetta": {
       "name": "@sylphx/rosetta",
-      "version": "0.5.4",
+      "version": "0.5.7",
       "bin": {
         "rosetta": "./dist/cli/index.js",
       },
@@ -33,7 +33,7 @@
     },
     "packages/rosetta-admin": {
       "name": "@sylphx/rosetta-admin",
-      "version": "0.3.4",
+      "version": "0.3.7",
       "devDependencies": {
         "@biomejs/biome": "^2.3.8",
         "@sylphx/biome-config": "^0.4.1",
@@ -51,7 +51,7 @@
         "zod": ">=3.0.0",
       },
       "peerDependencies": {
-        "@sylphx/rosetta": ">=0.3.0",
+        "@sylphx/rosetta": ">=0.6.0",
         "react": "^18.0.0 || ^19.0.0",
       },
       "optionalPeers": [
@@ -60,8 +60,9 @@
     },
     "packages/rosetta-drizzle": {
       "name": "@sylphx/rosetta-drizzle",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "devDependencies": {
+        "@sylphx/rosetta": "workspace:*",
         "@types/better-sqlite3": "^7.6.13",
         "@types/bun": "^1.1.14",
         "@typescript/native-preview": "^7.0.0-dev.20251207.1",
@@ -72,13 +73,13 @@
         "typescript": "^5",
       },
       "peerDependencies": {
-        "@sylphx/rosetta": ">=0.1.0",
+        "@sylphx/rosetta": ">=0.6.0",
         "drizzle-orm": ">=0.38.0",
       },
     },
     "packages/rosetta-next": {
       "name": "@sylphx/rosetta-next",
-      "version": "0.3.4",
+      "version": "0.4.0",
       "devDependencies": {
         "@types/node": "^22",
         "@types/react": "^19",
@@ -87,7 +88,7 @@
         "typescript": "^5",
       },
       "peerDependencies": {
-        "@sylphx/rosetta": ">=0.1.0",
+        "@sylphx/rosetta": ">=0.6.0",
         "next": ">=14.0.0",
         "react": "^18.0.0 || ^19.0.0",
       },

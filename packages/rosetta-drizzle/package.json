@@ -29,6 +29,7 @@
 		"drizzle-orm": ">=0.38.0"
 	},
 	"devDependencies": {
+		"@sylphx/rosetta": "workspace:*",
 		"@types/better-sqlite3": "^7.6.13",
 		"@types/bun": "^1.1.14",
 		"@typescript/native-preview": "^7.0.0-dev.20251207.1",
