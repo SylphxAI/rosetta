@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.8 (2025-12-12)
+
+### ♻️ Refactoring
+
+- move server code from rosetta core to rosetta-next ([84c45a2](https://github.com/SylphxAI/rosetta/commit/84c45a2194e056f98c86bb3b1c8a7120c4a42f93))
+
+### 🔧 Chores
+
+- fix lint errors and import organization ([2cbd713](https://github.com/SylphxAI/rosetta/commit/2cbd713f091bdeb9027155783db7f5ca1793dc94))
+
 ## 0.3.7 (2025-12-12)
 
 ### 📦 Dependencies

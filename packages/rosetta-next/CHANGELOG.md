@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.4.1 (2025-12-12)
+
+### 🐛 Bug Fixes
+
+- **rosetta-next:** add workspace dev dependency for types ([5f8cf7d](https://github.com/SylphxAI/rosetta/commit/5f8cf7dd3cdf21cbd65a3aecc688f94df45b3c9b))
+
+### ♻️ Refactoring
+
+- move server code from rosetta core to rosetta-next ([84c45a2](https://github.com/SylphxAI/rosetta/commit/84c45a2194e056f98c86bb3b1c8a7120c4a42f93))
+
+### 💅 Styles
+
+- format package.json files ([2ac26e7](https://github.com/SylphxAI/rosetta/commit/2ac26e7827ee02ad0874dc1c2f92ec26a3a40140))
+
+### ✅ Tests
+
+- add comprehensive tests for rosetta-next/server ([14e668a](https://github.com/SylphxAI/rosetta/commit/14e668ac42185a338931e322d5344078f5da0ef3))
+
+### 🔧 Chores
+
+- fix lint errors and import organization ([2cbd713](https://github.com/SylphxAI/rosetta/commit/2cbd713f091bdeb9027155783db7f5ca1793dc94))
+
 ## 0.3.6 (2025-12-12)
 
 ### 🐛 Bug Fixes

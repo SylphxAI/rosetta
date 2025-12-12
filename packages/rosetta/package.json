@@ -1,6 +1,6 @@
 {
 	"name": "@sylphx/rosetta",
-	"version": "0.5.7",
+	"version": "0.5.8",
 	"description": "Lightweight i18n library - pure utilities, zero Node.js dependencies",
 	"license": "MIT",
 	"type": "module",
@@ -26,7 +26,9 @@
 	"bin": {
 		"rosetta": "./dist/cli/index.js"
 	},
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"scripts": {
 		"build": "bunup src/index.ts --dts --format esm,cjs --target browser && bunup src/icu.ts --dts --clean=false --splitting=false --target browser && bunup src/adapters/index.ts src/cli/index.ts --dts --clean=false --splitting=false --target node",
 		"dev": "bunup src/index.ts src/icu.ts src/adapters/index.ts --dts --watch",

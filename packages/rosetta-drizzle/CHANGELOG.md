@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.2.2 (2025-12-12)
+
+### 🐛 Bug Fixes
+
+- **rosetta-drizzle:** add workspace dev dependency for build types ([8e989fd](https://github.com/SylphxAI/rosetta/commit/8e989fd89a65bca5243261c3828d978b3cdb2561))
+
+### ♻️ Refactoring
+
+- move server code from rosetta core to rosetta-next ([84c45a2](https://github.com/SylphxAI/rosetta/commit/84c45a2194e056f98c86bb3b1c8a7120c4a42f93))
+
+### 💅 Styles
+
+- format package.json files ([2ac26e7](https://github.com/SylphxAI/rosetta/commit/2ac26e7827ee02ad0874dc1c2f92ec26a3a40140))
+
 ## 0.2.1 (2025-12-12)
 
 ### 🐛 Bug Fixes

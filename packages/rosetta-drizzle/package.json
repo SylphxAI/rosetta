@@ -1,6 +1,6 @@
 {
 	"name": "@sylphx/rosetta-drizzle",
-	"version": "0.2.1",
+	"version": "0.2.2",
 	"description": "Drizzle ORM storage adapter for @sylphx/rosetta",
 	"license": "MIT",
 	"type": "module",
@@ -16,7 +16,9 @@
 			"require": "./dist/schema.cjs"
 		}
 	},
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"scripts": {
 		"build": "tsup src/index.ts src/schema.ts --dts --format esm,cjs --external @sylphx/rosetta",
 		"dev": "bunup src/index.ts src/schema.ts --dts --format esm,cjs --external drizzle-orm --external @sylphx/rosetta --watch",
@@ -51,5 +53,12 @@
 	"bugs": {
 		"url": "https://github.com/SylphxAI/rosetta/issues"
 	},
-	"keywords": ["i18n", "drizzle", "drizzle-orm", "translation", "rosetta", "storage-adapter"]
+	"keywords": [
+		"i18n",
+		"drizzle",
+		"drizzle-orm",
+		"translation",
+		"rosetta",
+		"storage-adapter"
+	]
 }
