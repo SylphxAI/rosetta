@@ -10,7 +10,7 @@
  *
  * // 2. Use the adapter in your Rosetta setup
  * import { DrizzleStorageAdapter } from '@sylphx/rosetta-drizzle';
- * import { Rosetta } from '@sylphx/rosetta/server';
+ * import { createRosetta } from '@sylphx/rosetta-next/server';
  *
  * const storage = new DrizzleStorageAdapter({
  *   db,
@@ -18,7 +18,7 @@
  *   translations: rosettaTranslations,
  * });
  *
- * export const rosetta = new Rosetta({
+ * export const rosetta = createRosetta({
  *   storage,
  *   defaultLocale: 'en',
  * });

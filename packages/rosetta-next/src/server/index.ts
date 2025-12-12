@@ -42,12 +42,9 @@
  * ```
  */
 
-// Server Provider
-export { RosettaProvider, type RosettaProviderProps, type RosettaManifest } from './server-provider';
-
 // Rosetta instance factory
-export { createRosetta, Rosetta } from './server/rosetta';
-export type { RosettaConfig, LocaleDetector } from './server/rosetta';
+export { createRosetta, Rosetta } from './rosetta';
+export type { RosettaConfig, LocaleDetector } from './rosetta';
 
 // Server context and translation function
 export {
@@ -61,14 +58,14 @@ export {
 	getRosettaContext,
 	isInsideRosettaContext,
 	rosettaStorage,
-} from './server/context';
-export type { RunWithRosettaOptions } from './server/context';
+} from './context';
+export type { RunWithRosettaOptions } from './context';
 
 // Cache adapters
-export { InMemoryCache, ExternalCache, RequestScopedCache } from './server/cache';
-export type { InMemoryCacheOptions, ExternalCacheOptions, RedisLikeClient } from './server/cache';
+export { InMemoryCache, ExternalCache, RequestScopedCache } from './cache';
+export type { InMemoryCacheOptions, ExternalCacheOptions, RedisLikeClient } from './cache';
 
-// Locale utilities
+// Re-export locale utilities from locale.ts
 export {
 	getReadyLocales,
 	buildLocaleCookie,
@@ -80,4 +77,6 @@ export {
 	type LocaleWithStats,
 	type GetReadyLocalesOptions,
 	type LocaleCookieOptions,
-} from './locale';
+} from '../locale';
+
+// Provider will be exported separately to avoid circular dependency

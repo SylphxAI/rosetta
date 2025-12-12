@@ -5,7 +5,7 @@
  */
 
 import { describe, expect, test } from 'bun:test';
-import type { Rosetta } from '@sylphx/rosetta/server';
+import type { Rosetta } from '../server/rosetta';
 import {
 	type LocaleConfig,
 	buildLocaleCookie,

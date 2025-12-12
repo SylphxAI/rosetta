@@ -25,7 +25,7 @@
 		"clean": "rm -rf dist"
 	},
 	"peerDependencies": {
-		"@sylphx/rosetta": ">=0.3.0",
+		"@sylphx/rosetta": ">=0.6.0",
 		"drizzle-orm": ">=0.38.0"
 	},
 	"devDependencies": {

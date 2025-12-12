@@ -1,6 +1,6 @@
 {
 	"name": "@sylphx/rosetta-next",
-	"version": "0.3.6",
+	"version": "0.4.0",
 	"description": "Next.js integration for @sylphx/rosetta i18n",
 	"license": "MIT",
 	"type": "module",
@@ -30,7 +30,7 @@
 	},
 	"files": ["dist"],
 	"scripts": {
-		"build": "NODE_ENV=production bunup src/locales.ts --format esm --dts --external react --external @sylphx/rosetta --splitting=false --target browser && bunup src/index.tsx src/server.tsx --format esm --dts --external react --external @sylphx/rosetta --jsx.runtime automatic --jsx.import-source react --no-clean --splitting=false --target browser && bunup src/loader.ts src/sync.ts --format esm,cjs --dts --external react --external @sylphx/rosetta --no-clean --splitting=false --target node && bun run build:fix",
+		"build": "NODE_ENV=production bunup src/locales.ts --format esm --dts --external react --external @sylphx/rosetta --splitting=false --target browser && bunup src/index.tsx --format esm --dts --external react --external @sylphx/rosetta --jsx.runtime automatic --jsx.import-source react --no-clean --splitting=false --target browser && bunup src/server.tsx --format esm --dts --external react --external @sylphx/rosetta --jsx.runtime automatic --jsx.import-source react --no-clean --splitting=false --target node && bunup src/loader.ts src/sync.ts --format esm,cjs --dts --external react --external @sylphx/rosetta --no-clean --splitting=false --target node && bun run build:fix",
 		"build:fix": "find dist -name '*.js' -exec sed -i.bak 's/jsx-dev-runtime/jsx-runtime/g; s/jsxDEV/jsx/g' {} \\; && find dist -name '*.bak' -delete",
 		"dev": "bunup src/index.tsx src/server.tsx src/loader.ts src/sync.ts --format esm --dts --external react --external @sylphx/rosetta --watch",
 		"test": "bun test",
@@ -38,7 +38,7 @@
 		"clean": "rm -rf dist"
 	},
 	"peerDependencies": {
-		"@sylphx/rosetta": ">=0.3.0",
+		"@sylphx/rosetta": ">=0.6.0",
 		"next": ">=14.0.0",
 		"react": "^18.0.0 || ^19.0.0"
 	},
@@ -61,13 +61,5 @@
 	"bugs": {
 		"url": "https://github.com/SylphxAI/rosetta/issues"
 	},
-	"keywords": [
-		"i18n",
-		"nextjs",
-		"next",
-		"translation",
-		"rosetta",
-		"app-router",
-		"server-components"
-	]
+	"keywords": ["i18n", "nextjs", "next", "translation", "rosetta", "app-router", "server-components"]
 }

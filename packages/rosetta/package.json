@@ -1,7 +1,7 @@
 {
 	"name": "@sylphx/rosetta",
 	"version": "0.5.7",
-	"description": "Lightweight i18n library with LLM-powered translation generation",
+	"description": "Lightweight i18n library - pure utilities, zero Node.js dependencies",
 	"license": "MIT",
 	"type": "module",
 	"exports": {
@@ -10,17 +10,13 @@
 			"import": "./dist/index.js",
 			"require": "./dist/index.cjs"
 		},
-		"./server": {
-			"types": "./dist/server/index.d.ts",
-			"import": "./dist/server/index.js"
+		"./icu": {
+			"types": "./dist/icu.d.ts",
+			"import": "./dist/icu.js"
 		},
 		"./adapters": {
 			"types": "./dist/adapters/index.d.ts",
 			"import": "./dist/adapters/index.js"
-		},
-		"./icu": {
-			"types": "./dist/icu.d.ts",
-			"import": "./dist/icu.js"
 		},
 		"./cli": {
 			"types": "./dist/cli/index.d.ts",
@@ -34,8 +30,8 @@
 		"dist"
 	],
 	"scripts": {
-		"build": "bunup src/index.ts --dts --format esm,cjs --target browser && bunup src/server/index.ts --dts --clean=false --splitting=false --target node --out-dir dist/server && bunup src/icu.ts --dts --clean=false --splitting=false --target browser && bunup src/adapters/index.ts src/cli/index.ts --dts --clean=false --splitting=false --target node",
-		"dev": "bunup src/index.ts src/server/index.ts src/adapters/index.ts src/icu.ts --dts --watch",
+		"build": "bunup src/index.ts --dts --format esm,cjs --target browser && bunup src/icu.ts --dts --clean=false --splitting=false --target browser && bunup src/adapters/index.ts src/cli/index.ts --dts --clean=false --splitting=false --target node",
+		"dev": "bunup src/index.ts src/icu.ts src/adapters/index.ts --dts --watch",
 		"test": "bun test",
 		"typecheck": "tsc --noEmit",
 		"clean": "rm -rf dist",
@@ -65,12 +61,5 @@
 	"bugs": {
 		"url": "https://github.com/SylphxAI/rosetta/issues"
 	},
-	"keywords": [
-		"i18n",
-		"internationalization",
-		"translation",
-		"localization",
-		"llm",
-		"ai-translation"
-	]
+	"keywords": ["i18n", "internationalization", "translation", "localization", "llm", "ai-translation"]
 }

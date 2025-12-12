@@ -49,7 +49,7 @@
  * ```
  */
 
-import type { Rosetta } from '@sylphx/rosetta/server';
+import type { Rosetta } from './server/rosetta';
 
 // ============================================
 // Types
