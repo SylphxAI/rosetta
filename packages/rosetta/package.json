@@ -34,7 +34,7 @@
 		"dist"
 	],
 	"scripts": {
-		"build": "bunup src/index.ts --dts --format esm,cjs --target browser && bunup src/server/index.ts src/icu.ts --dts --clean=false --splitting=false --target browser && bunup src/adapters/index.ts src/cli/index.ts --dts --clean=false --splitting=false --target node",
+		"build": "bunup src/index.ts --dts --format esm,cjs --target browser && bunup src/server/index.ts --dts --clean=false --splitting=false --target node --out-dir dist/server && bunup src/icu.ts --dts --clean=false --splitting=false --target browser && bunup src/adapters/index.ts src/cli/index.ts --dts --clean=false --splitting=false --target node",
 		"dev": "bunup src/index.ts src/server/index.ts src/adapters/index.ts src/icu.ts --dts --watch",
 		"test": "bun test",
 		"typecheck": "tsc --noEmit",
