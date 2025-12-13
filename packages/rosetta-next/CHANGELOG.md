@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.2 (2025-12-13)
+
+### 🐛 Bug Fixes
+
+- remove unused import ([7914588](https://github.com/SylphxAI/rosetta/commit/79145889ec527857c1f979f46973bd4ee193aa0a))
+- **rosetta-next:** separate server and client code bundles ([646cf27](https://github.com/SylphxAI/rosetta/commit/646cf27baf1e0e748514c0ebc34e87146832c0db))
+
 ## 0.4.1 (2025-12-12)
 
 ### 🐛 Bug Fixes

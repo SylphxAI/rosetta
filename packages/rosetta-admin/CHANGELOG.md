@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.9 (2025-12-13)
+
+### 🐛 Bug Fixes
+
+- **rosetta-next:** separate server and client code bundles ([646cf27](https://github.com/SylphxAI/rosetta/commit/646cf27baf1e0e748514c0ebc34e87146832c0db))
+
 ## 0.3.8 (2025-12-12)
 
 ### ♻️ Refactoring
