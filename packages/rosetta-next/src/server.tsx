@@ -1,6 +1,9 @@
 /**
  * @sylphx/rosetta-next/server - Server-side Rosetta integration for Next.js
  *
+ * IMPORTANT: This module is server-only. It contains AsyncLocalStorage and
+ * other Node.js APIs that cannot run in the browser.
+ *
  * @example Setup
  * ```ts
  * // lib/i18n.ts
@@ -13,19 +16,24 @@
  * })
  * ```
  *
- * @example Layout
+ * @example Layout with both providers
  * ```tsx
  * // app/[locale]/layout.tsx
- * import { RosettaProvider } from '@sylphx/rosetta-next/server'
+ * import { RosettaProvider, getClientData } from '@sylphx/rosetta-next/server'
+ * import { RosettaClientProvider } from '@sylphx/rosetta-next'
  * import { rosetta } from '@/lib/i18n'
  *
  * export default async function Layout({ children, params }) {
  *   const { locale } = await params
+ *   const clientData = await getClientData(rosetta, locale)
+ *
  *   return (
  *     <RosettaProvider rosetta={rosetta} locale={locale}>
- *       <html lang={locale}>
- *         <body>{children}</body>
- *       </html>
+ *       <RosettaClientProvider {...clientData}>
+ *         <html lang={locale}>
+ *           <body>{children}</body>
+ *         </html>
+ *       </RosettaClientProvider>
  *     </RosettaProvider>
  *   )
  * }
@@ -42,11 +50,13 @@
  * ```
  */
 
-// Server Provider
+// Server Provider and helpers
 export {
 	RosettaProvider,
+	getClientData,
 	type RosettaProviderProps,
 	type RosettaManifest,
+	type RosettaClientData,
 } from './server-provider';
 
 // Rosetta instance factory
