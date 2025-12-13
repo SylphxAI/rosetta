@@ -1,6 +1,6 @@
 {
 	"name": "@sylphx/rosetta",
-	"version": "0.5.9",
+	"version": "0.5.10",
 	"description": "Lightweight i18n library - pure utilities, zero Node.js dependencies",
 	"license": "MIT",
 	"type": "module",

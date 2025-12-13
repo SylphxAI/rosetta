@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.10 (2025-12-13)
+
+### 🐛 Bug Fixes
+
+- **rosetta-admin:** use jsx-runtime instead of jsx-dev-runtime in production build ([47f5fde](https://github.com/SylphxAI/rosetta/commit/47f5fde1de510568e9ec5ab48562c035072a725b))
+
+### ♻️ Refactoring
+
+- deep cleanup and critical bug fixes (#60) ([e8ef654](https://github.com/SylphxAI/rosetta/commit/e8ef654cd2b6528fc3663d5cce680fc408223118))
+
 ## 0.3.9 (2025-12-13)
 
 ### 🐛 Bug Fixes

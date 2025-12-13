@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.10 (2025-12-13)
+
+### ♻️ Refactoring
+
+- deep cleanup and critical bug fixes (#60) ([e8ef654](https://github.com/SylphxAI/rosetta/commit/e8ef654cd2b6528fc3663d5cce680fc408223118))
+
 ## 0.5.9 (2025-12-13)
 
 ### 🐛 Bug Fixes

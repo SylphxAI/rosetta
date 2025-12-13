@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.2 (2025-12-13)
+
+### ♻️ Refactoring
+
+- deep cleanup and critical bug fixes (#60) ([e8ef654](https://github.com/SylphxAI/rosetta/commit/e8ef654cd2b6528fc3663d5cce680fc408223118))
+
+### 💅 Styles
+
+- format package.json files ([f26787d](https://github.com/SylphxAI/rosetta/commit/f26787d55f657f22eb764651104feb775f7a98db))
+
 ## 0.1.1
 
 ### Patch Changes
