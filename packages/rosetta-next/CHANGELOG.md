@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.4 (2025-12-13)
+
+### ✨ Features
+
+- **rosetta-next:** add setRequestLocale for implicit locale passing ([b62ab86](https://github.com/SylphxAI/rosetta/commit/b62ab8614701296eb83774c02a51a94d0d131cf4))
+
 ## 0.4.3 (2025-12-13)
 
 ### ♻️ Refactoring
