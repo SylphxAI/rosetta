@@ -1,8 +1,7 @@
 /**
  * @sylphx/rosetta-next/server - Server-side Rosetta integration for Next.js
  *
- * IMPORTANT: This module is server-only. It contains AsyncLocalStorage and
- * other Node.js APIs that cannot run in the browser.
+ * Edge-compatible: Works in Node.js, Vercel Edge, Cloudflare Workers, Deno Deploy.
  *
  * @example Setup
  * ```ts
@@ -16,41 +15,42 @@
  * })
  * ```
  *
- * @example Layout with both providers
+ * @example Layout
  * ```tsx
  * // app/[locale]/layout.tsx
- * import { RosettaProvider, getClientData } from '@sylphx/rosetta-next/server'
- * import { RosettaClientProvider } from '@sylphx/rosetta-next'
  * import { rosetta } from '@/lib/i18n'
+ * import { RosettaClientProvider } from '@sylphx/rosetta-next'
  *
  * export default async function Layout({ children, params }) {
  *   const { locale } = await params
- *   const clientData = await getClientData(rosetta, locale)
+ *   const clientData = await rosetta.getClientData(locale)
  *
  *   return (
- *     <RosettaProvider rosetta={rosetta} locale={locale}>
- *       <RosettaClientProvider {...clientData}>
- *         <html lang={locale}>
- *           <body>{children}</body>
- *         </html>
- *       </RosettaClientProvider>
- *     </RosettaProvider>
+ *     <html lang={locale}>
+ *       <body>
+ *         <RosettaClientProvider {...clientData}>
+ *           {children}
+ *         </RosettaClientProvider>
+ *       </body>
+ *     </html>
  *   )
  * }
  * ```
  *
  * @example Server Component
  * ```tsx
- * import { getTranslations } from '@sylphx/rosetta-next/server'
+ * // app/[locale]/page.tsx
+ * import { rosetta } from '@/lib/i18n'
  *
- * export default async function Page() {
- *   const t = await getTranslations()
+ * export default async function Page({ params }) {
+ *   const { locale } = await params
+ *   const t = await rosetta.getTranslations(locale)
  *   return <h1>{t("Welcome")}</h1>
  * }
  * ```
  */
 
-// Server Provider and helpers
+// Server Provider and helpers (legacy, for backward compatibility)
 export {
 	RosettaProvider,
 	getClientData,
@@ -63,20 +63,23 @@ export {
 export { createRosetta, Rosetta } from './server/rosetta';
 export type { RosettaConfig, LocaleDetector } from './server/rosetta';
 
-// Server context and translation function
+// Translation utilities
 export {
+	createTranslator,
+	createCachedTranslations,
 	t,
-	getTranslationsAsync as getTranslations,
+	translationsToRecord,
+	type TranslateFunction,
+	type TranslatorContext,
+} from './server/context';
+
+// Legacy API (deprecated, for migration)
+export {
 	getLocale,
 	getDefaultLocale,
 	getLocaleChain,
-	getTranslationsForClient,
-	runWithRosetta,
-	getRosettaContext,
-	isInsideRosettaContext,
-	rosettaStorage,
+	getTranslationsAsync as getTranslations,
 } from './server/context';
-export type { RunWithRosettaOptions } from './server/context';
 
 // Cache adapters
 export { InMemoryCache, ExternalCache, RequestScopedCache } from './server/cache';

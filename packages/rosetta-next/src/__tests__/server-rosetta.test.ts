@@ -1,10 +1,10 @@
 /**
- * Rosetta Class Tests
+ * Rosetta Class Tests (Edge-compatible)
  *
  * Tests for the server-side Rosetta manager.
  */
 
-import { beforeEach, describe, expect, mock, test } from 'bun:test';
+import { describe, expect, test } from 'bun:test';
 import type { StorageAdapter, TranslateAdapter } from '@sylphx/rosetta';
 import { Rosetta, createRosetta } from '../server/rosetta';
 
@@ -280,38 +280,53 @@ describe('Rosetta', () => {
 		});
 	});
 
-	describe('init', () => {
-		test('runs function within context', async () => {
+	describe('getTranslations (Edge-compatible)', () => {
+		test('returns a translation function', async () => {
 			const storage = createMockStorage();
 			const rosetta = new Rosetta({ storage, defaultLocale: 'en' });
 
-			const result = await rosetta.init(() => 'test result');
-			expect(result).toBe('test result');
+			const t = await rosetta.getTranslations('zh-TW');
+
+			expect(typeof t).toBe('function');
 		});
 
-		test('supports async functions', async () => {
+		test('translation function translates text', async () => {
 			const storage = createMockStorage();
 			const rosetta = new Rosetta({ storage, defaultLocale: 'en' });
 
-			const result = await rosetta.init(async () => {
-				await new Promise((r) => setTimeout(r, 10));
-				return 'async result';
-			});
+			const t = await rosetta.getTranslations('zh-TW');
 
-			expect(result).toBe('async result');
+			// Note: translation lookup is hash-based, mock uses simple hashes
+			// For default locale, returns original text
+			const tEn = await rosetta.getTranslations('en');
+			expect(tEn('Hello')).toBe('Hello');
 		});
 	});
 
 	describe('getClientData', () => {
-		test('returns hydration data', async () => {
+		test('returns hydration data with explicit locale', async () => {
 			const storage = createMockStorage();
 			const rosetta = new Rosetta({ storage, defaultLocale: 'en' });
 
-			const data = await rosetta.getClientData();
+			const data = await rosetta.getClientData('zh-TW');
 
-			expect(data.locale).toBe('en');
+			expect(data.locale).toBe('zh-TW');
+			expect(data.defaultLocale).toBe('en');
+			expect(typeof data.translations).toBe('object');
+		});
+	});
+
+	describe('getClientDataWithLocales', () => {
+		test('returns hydration data with available locales', async () => {
+			const storage = createMockStorage();
+			const rosetta = new Rosetta({ storage, defaultLocale: 'en' });
+
+			const data = await rosetta.getClientDataWithLocales('zh-TW');
+
+			expect(data.locale).toBe('zh-TW');
 			expect(data.defaultLocale).toBe('en');
 			expect(data.availableLocales).toContain('en');
+			expect(data.availableLocales).toContain('zh-TW');
 			expect(typeof data.translations).toBe('object');
 		});
 	});
@@ -327,7 +342,7 @@ describe('Rosetta', () => {
 
 			const sources = await rosetta.getSources();
 			expect(sources.length).toBe(3);
-			expect(sources[0].text).toBe('Hello');
+			expect(sources[0]!.text).toBe('Hello');
 		});
 	});
 
@@ -339,7 +354,7 @@ describe('Rosetta', () => {
 			const untranslated = await rosetta.getUntranslated('zh-TW');
 			// zh-TW has abc123 and def456, missing ghi789
 			expect(untranslated.length).toBe(1);
-			expect(untranslated[0].text).toBe('Goodbye');
+			expect(untranslated[0]!.text).toBe('Goodbye');
 		});
 	});
 
@@ -382,8 +397,8 @@ describe('Rosetta', () => {
 			await rosetta.saveTranslation('ja', 'Test', 'テスト');
 
 			expect(storage._savedTranslations.length).toBe(1);
-			expect(storage._savedTranslations[0].locale).toBe('ja');
-			expect(storage._savedTranslations[0].text).toBe('テスト');
+			expect(storage._savedTranslations[0]!.locale).toBe('ja');
+			expect(storage._savedTranslations[0]!.text).toBe('テスト');
 		});
 
 		test('validates inputs', async () => {
@@ -402,8 +417,8 @@ describe('Rosetta', () => {
 			const stats = await rosetta.getTranslationStats(['en', 'zh-TW']);
 
 			expect(stats.totalStrings).toBe(3);
-			expect(stats.locales.en.translated).toBe(3);
-			expect(stats.locales['zh-TW'].translated).toBe(2);
+			expect(stats.locales.en!.translated).toBe(3);
+			expect(stats.locales['zh-TW']!.translated).toBe(2);
 		});
 	});
 

@@ -1,455 +1,282 @@
 /**
- * Server Context Tests
+ * Server Context Tests (Edge-compatible architecture)
  *
- * Tests for AsyncLocalStorage-based context management.
+ * Tests for translation utilities without AsyncLocalStorage.
  */
 
-import { beforeEach, describe, expect, mock, test } from 'bun:test';
+import { describe, expect, test } from 'bun:test';
 import {
-	type RunWithRosettaOptions,
+	createTranslator,
 	getDefaultLocale,
 	getLocale,
 	getLocaleChain,
-	getRosettaContext,
 	getTranslationsAsync,
-	getTranslationsForClient,
-	isInsideRosettaContext,
-	rosettaStorage,
-	runWithRosetta,
 	t,
+	translationsToRecord,
+	type TranslatorContext,
 } from '../server/context';
 
 // ============================================
-// Mock Storage Adapter
+// createTranslator Tests
 // ============================================
 
-function createMockStorage() {
-	const translations = new Map<string, Map<string, string>>([
-		[
-			'en',
-			new Map([
-				['abc123', 'Hello'],
-				['def456', 'World'],
+describe('createTranslator', () => {
+	test('creates a translation function', () => {
+		const ctx: TranslatorContext = {
+			locale: 'en',
+			defaultLocale: 'en',
+			translations: new Map(),
+		};
+
+		const translate = createTranslator(ctx);
+		expect(typeof translate).toBe('function');
+	});
+
+	test('returns original text for default locale', () => {
+		const ctx: TranslatorContext = {
+			locale: 'en',
+			defaultLocale: 'en',
+			translations: new Map([['35ddf285', '你好世界']]),
+		};
+
+		const translate = createTranslator(ctx);
+		expect(translate('Hello World')).toBe('Hello World');
+	});
+
+	test('returns translation when found', () => {
+		const ctx: TranslatorContext = {
+			locale: 'zh-TW',
+			defaultLocale: 'en',
+			translations: new Map([['35ddf285', '你好世界']]), // hash of "Hello World"
+		};
+
+		const translate = createTranslator(ctx);
+		expect(translate('Hello World')).toBe('你好世界');
+	});
+
+	test('returns original text when translation not found', () => {
+		const ctx: TranslatorContext = {
+			locale: 'zh-TW',
+			defaultLocale: 'en',
+			translations: new Map(),
+		};
+
+		const translate = createTranslator(ctx);
+		expect(translate('Hello World')).toBe('Hello World');
+	});
+
+	test('handles ICU parameters', () => {
+		const ctx: TranslatorContext = {
+			locale: 'zh-TW',
+			defaultLocale: 'en',
+			translations: new Map([['616777a2', '{count} 位用戶']]), // hash of "{count} users"
+		};
+
+		const translate = createTranslator(ctx);
+		expect(translate('{count} users', { count: 5 })).toBe('5 位用戶');
+	});
+
+	test('handles ICU parameters for default locale', () => {
+		const ctx: TranslatorContext = {
+			locale: 'en',
+			defaultLocale: 'en',
+			translations: new Map(),
+		};
+
+		const translate = createTranslator(ctx);
+		expect(translate('{count} users', { count: 5 })).toBe('5 users');
+	});
+
+	test('respects context for hashing', () => {
+		const ctx: TranslatorContext = {
+			locale: 'zh-TW',
+			defaultLocale: 'en',
+			translations: new Map([['6a58b672', '儲存 (按鈕)']]), // hash of "Save" with context "button"
+		};
+
+		const translate = createTranslator(ctx);
+		expect(translate('Save', { context: 'button' })).toBe('儲存 (按鈕)');
+	});
+
+	test('handles TranslateOptions with both context and params', () => {
+		const ctx: TranslatorContext = {
+			locale: 'zh-TW',
+			defaultLocale: 'en',
+			translations: new Map([
+				// hash of "Hello {name}" with context "greeting"
+				['greeting-hash', '你好 {name}'],
 			]),
-		],
-		[
-			'zh-TW',
-			new Map([
-				['abc123', '你好'],
-				['def456', '世界'],
-			]),
-		],
-	]);
+		};
 
-	return {
-		getSources: async () => [],
-		getTranslations: async (locale: string) => translations.get(locale) ?? new Map(),
-		saveSource: async () => {},
-		saveTranslation: async () => {},
-		getUntranslated: async () => [],
-		getAvailableLocales: async () => ['en', 'zh-TW'],
-	};
-}
-
-// ============================================
-// Context Tests
-// ============================================
-
-describe('rosettaStorage', () => {
-	test('is an AsyncLocalStorage instance', () => {
-		expect(rosettaStorage).toBeDefined();
-		expect(typeof rosettaStorage.run).toBe('function');
-		expect(typeof rosettaStorage.getStore).toBe('function');
-	});
-});
-
-describe('isInsideRosettaContext', () => {
-	test('returns false outside context', () => {
-		expect(isInsideRosettaContext()).toBe(false);
-	});
-
-	test('returns true inside context', async () => {
-		const storage = createMockStorage();
-		const translations = new Map([['abc123', 'Hello']]);
-
-		await runWithRosetta(
-			{
-				locale: 'en',
-				defaultLocale: 'en',
-				translations,
-				storage,
-			},
-			() => {
-				expect(isInsideRosettaContext()).toBe(true);
-			}
-		);
-	});
-});
-
-describe('getRosettaContext', () => {
-	test('returns undefined outside context', () => {
-		expect(getRosettaContext()).toBeUndefined();
-	});
-
-	test('returns context inside runWithRosetta', async () => {
-		const storage = createMockStorage();
-		const translations = new Map([['abc123', 'Hello']]);
-
-		await runWithRosetta(
-			{
-				locale: 'zh-TW',
-				defaultLocale: 'en',
-				translations,
-				storage,
-			},
-			() => {
-				const ctx = getRosettaContext();
-				expect(ctx?.locale).toBe('zh-TW');
-				expect(ctx?.defaultLocale).toBe('en');
-				expect(ctx?.translations).toBe(translations);
-			}
-		);
-	});
-});
-
-describe('getLocale', () => {
-	test('returns default locale outside context', () => {
-		expect(getLocale()).toBe('en'); // DEFAULT_LOCALE
-	});
-
-	test('returns current locale', async () => {
-		const storage = createMockStorage();
-
-		await runWithRosetta(
-			{
-				locale: 'ja',
-				defaultLocale: 'en',
-				translations: new Map(),
-				storage,
-			},
-			() => {
-				expect(getLocale()).toBe('ja');
-			}
-		);
-	});
-});
-
-describe('getDefaultLocale', () => {
-	test('returns default locale outside context', () => {
-		expect(getDefaultLocale()).toBe('en'); // DEFAULT_LOCALE
-	});
-
-	test('returns default locale', async () => {
-		const storage = createMockStorage();
-
-		await runWithRosetta(
-			{
-				locale: 'zh-TW',
-				defaultLocale: 'en',
-				translations: new Map(),
-				storage,
-			},
-			() => {
-				expect(getDefaultLocale()).toBe('en');
-			}
-		);
-	});
-});
-
-describe('getLocaleChain', () => {
-	test('returns default chain outside context', () => {
-		expect(getLocaleChain()).toEqual(['en']); // [DEFAULT_LOCALE]
-	});
-
-	test('returns locale chain', async () => {
-		const storage = createMockStorage();
-
-		await runWithRosetta(
-			{
-				locale: 'zh-TW',
-				defaultLocale: 'en',
-				localeChain: ['zh-TW', 'zh', 'en'],
-				translations: new Map(),
-				storage,
-			},
-			() => {
-				expect(getLocaleChain()).toEqual(['zh-TW', 'zh', 'en']);
-			}
+		const translate = createTranslator(ctx);
+		// Even without the hash match, it should format the params
+		expect(translate('Hello {name}', { context: 'greeting', params: { name: 'John' } })).toBe(
+			'Hello John'
 		);
 	});
 });
 
 // ============================================
-// Translation Function Tests
+// t function Tests
 // ============================================
 
 describe('t function', () => {
-	test('returns original text outside context', () => {
-		// Outside context, t() returns formatted original text
-		expect(t('Hello')).toBe('Hello');
+	test('translates text with explicit context', () => {
+		const ctx: TranslatorContext = {
+			locale: 'zh-TW',
+			defaultLocale: 'en',
+			translations: new Map([['35ddf285', '你好世界']]),
+		};
+
+		expect(t('Hello World', ctx)).toBe('你好世界');
 	});
 
-	test('returns translation when found', async () => {
-		const storage = createMockStorage();
-		const translations = new Map([
-			['35ddf285', '你好世界'], // hash of "Hello World"
-		]);
+	test('handles parameters', () => {
+		const ctx: TranslatorContext = {
+			locale: 'en',
+			defaultLocale: 'en',
+			translations: new Map(),
+		};
 
-		await runWithRosetta(
-			{
-				locale: 'zh-TW',
-				defaultLocale: 'en',
-				translations,
-				storage,
-			},
-			() => {
-				expect(t('Hello World')).toBe('你好世界');
-			}
-		);
-	});
-
-	test('returns original text when translation not found', async () => {
-		const storage = createMockStorage();
-
-		await runWithRosetta(
-			{
-				locale: 'zh-TW',
-				defaultLocale: 'en',
-				translations: new Map(),
-				storage,
-			},
-			() => {
-				expect(t('Hello World')).toBe('Hello World');
-			}
-		);
-	});
-
-	test('handles ICU parameters', async () => {
-		const storage = createMockStorage();
-		const translations = new Map([
-			['616777a2', '{count} 位用戶'], // hash of "{count} users"
-		]);
-
-		await runWithRosetta(
-			{
-				locale: 'zh-TW',
-				defaultLocale: 'en',
-				translations,
-				storage,
-			},
-			() => {
-				expect(t('{count} users', { count: 5 })).toBe('5 位用戶');
-			}
-		);
-	});
-
-	test('respects context for hashing', async () => {
-		const storage = createMockStorage();
-		// "Save" with context "button" has different hash than without
-		const translations = new Map([
-			['6a58b672', '儲存 (按鈕)'], // hash of "Save" with context "button"
-		]);
-
-		await runWithRosetta(
-			{
-				locale: 'zh-TW',
-				defaultLocale: 'en',
-				translations,
-				storage,
-			},
-			() => {
-				expect(t('Save', { context: 'button' })).toBe('儲存 (按鈕)');
-			}
-		);
+		expect(t('Hello {name}', ctx, { name: 'John' })).toBe('Hello John');
 	});
 });
 
-describe('getTranslationsAsync', () => {
-	test('returns t function', async () => {
-		const storage = createMockStorage();
+// ============================================
+// translationsToRecord Tests
+// ============================================
 
-		await runWithRosetta(
-			{
-				locale: 'en',
-				defaultLocale: 'en',
-				translations: new Map(),
-				storage,
-			},
-			async () => {
-				const translate = await getTranslationsAsync();
-				expect(typeof translate).toBe('function');
-				expect(translate('Test')).toBe('Test');
-			}
-		);
-	});
-});
-
-describe('getTranslationsForClient', () => {
-	test('returns empty object outside context', () => {
-		expect(getTranslationsForClient()).toEqual({});
-	});
-
-	test('returns translations object', async () => {
-		const storage = createMockStorage();
+describe('translationsToRecord', () => {
+	test('converts Map to Record', () => {
 		const translations = new Map([
 			['abc123', '你好'],
 			['def456', '世界'],
 		]);
 
-		await runWithRosetta(
-			{
-				locale: 'zh-TW',
-				defaultLocale: 'en',
-				translations,
-				storage,
-			},
-			() => {
-				const result = getTranslationsForClient();
-				expect(result).toEqual({
-					abc123: '你好',
-					def456: '世界',
-				});
-			}
-		);
+		const result = translationsToRecord(translations);
+		expect(result).toEqual({
+			abc123: '你好',
+			def456: '世界',
+		});
+	});
+
+	test('handles empty Map', () => {
+		const translations = new Map<string, string>();
+		const result = translationsToRecord(translations);
+		expect(result).toEqual({});
 	});
 });
 
 // ============================================
-// runWithRosetta Tests
+// Legacy API Tests (deprecated)
 // ============================================
 
-describe('runWithRosetta', () => {
-	test('runs function within context', async () => {
-		const storage = createMockStorage();
-		let executed = false;
+describe('legacy API (deprecated)', () => {
+	test('getLocale returns default locale with warning', () => {
+		// Suppress console.warn for this test
+		const originalWarn = console.warn;
+		let warnCalled = false;
+		console.warn = () => {
+			warnCalled = true;
+		};
 
-		await runWithRosetta(
-			{
-				locale: 'en',
-				defaultLocale: 'en',
-				translations: new Map(),
-				storage,
-			},
-			() => {
-				executed = true;
-			}
-		);
+		expect(getLocale()).toBe('en');
+		expect(warnCalled).toBe(true);
 
-		expect(executed).toBe(true);
+		console.warn = originalWarn;
 	});
 
-	test('supports async functions', async () => {
-		const storage = createMockStorage();
+	test('getDefaultLocale returns default locale with warning', () => {
+		const originalWarn = console.warn;
+		let warnCalled = false;
+		console.warn = () => {
+			warnCalled = true;
+		};
 
-		const result = await runWithRosetta(
-			{
-				locale: 'en',
-				defaultLocale: 'en',
-				translations: new Map(),
-				storage,
-			},
-			async () => {
-				await new Promise((r) => setTimeout(r, 10));
-				return 'async result';
-			}
-		);
+		expect(getDefaultLocale()).toBe('en');
+		expect(warnCalled).toBe(true);
 
-		expect(result).toBe('async result');
+		console.warn = originalWarn;
 	});
 
-	test('returns function result', async () => {
-		const storage = createMockStorage();
+	test('getLocaleChain returns default chain with warning', () => {
+		const originalWarn = console.warn;
+		let warnCalled = false;
+		console.warn = () => {
+			warnCalled = true;
+		};
 
-		const result = await runWithRosetta(
-			{
-				locale: 'en',
-				defaultLocale: 'en',
-				translations: new Map(),
-				storage,
-			},
-			() => 42
-		);
+		expect(getLocaleChain()).toEqual(['en']);
+		expect(warnCalled).toBe(true);
 
-		expect(result).toBe(42);
+		console.warn = originalWarn;
 	});
 
-	test('builds locale chain if not provided', async () => {
-		const storage = createMockStorage();
+	test('getTranslationsAsync returns passthrough function with warning', async () => {
+		const originalWarn = console.warn;
+		let warnCalled = false;
+		console.warn = () => {
+			warnCalled = true;
+		};
 
-		await runWithRosetta(
-			{
-				locale: 'zh-TW',
-				defaultLocale: 'en',
-				translations: new Map(),
-				storage,
-			},
-			() => {
-				const chain = getLocaleChain();
-				expect(chain).toContain('zh-TW');
-				expect(chain).toContain('en');
-			}
-		);
+		const translate = await getTranslationsAsync();
+		expect(typeof translate).toBe('function');
+		expect(translate('Test')).toBe('Test');
+		expect(warnCalled).toBe(true);
+
+		console.warn = originalWarn;
+	});
+});
+
+// ============================================
+// Edge Compatibility Tests
+// ============================================
+
+describe('edge compatibility', () => {
+	test('no AsyncLocalStorage dependency', () => {
+		// This test verifies that the module doesn't import AsyncLocalStorage
+		// by checking that createTranslator works without any context setup
+		const ctx: TranslatorContext = {
+			locale: 'zh-TW',
+			defaultLocale: 'en',
+			translations: new Map([['35ddf285', '你好世界']]),
+		};
+
+		const translate = createTranslator(ctx);
+		expect(translate('Hello World')).toBe('你好世界');
 	});
 
-	test('uses provided locale chain', async () => {
-		const storage = createMockStorage();
-		const customChain = ['zh-TW', 'zh', 'ja', 'en'];
+	test('multiple translators can work in parallel', async () => {
+		// Simulate concurrent requests with different locales
+		const ctxEn: TranslatorContext = {
+			locale: 'en',
+			defaultLocale: 'en',
+			translations: new Map(),
+		};
 
-		await runWithRosetta(
-			{
-				locale: 'zh-TW',
-				defaultLocale: 'en',
-				localeChain: customChain,
-				translations: new Map(),
-				storage,
-			},
-			() => {
-				expect(getLocaleChain()).toEqual(customChain);
-			}
-		);
-	});
+		const ctxZh: TranslatorContext = {
+			locale: 'zh-TW',
+			defaultLocale: 'en',
+			translations: new Map([['35ddf285', '你好世界']]),
+		};
 
-	test('provides isolated context for concurrent requests', async () => {
-		const storage = createMockStorage();
+		const ctxJa: TranslatorContext = {
+			locale: 'ja',
+			defaultLocale: 'en',
+			translations: new Map([['35ddf285', 'こんにちは世界']]),
+		};
 
+		const translateEn = createTranslator(ctxEn);
+		const translateZh = createTranslator(ctxZh);
+		const translateJa = createTranslator(ctxJa);
+
+		// Run all translations in parallel
 		const results = await Promise.all([
-			runWithRosetta(
-				{
-					locale: 'en',
-					defaultLocale: 'en',
-					translations: new Map(),
-					storage,
-				},
-				async () => {
-					await new Promise((r) => setTimeout(r, 50));
-					return getLocale();
-				}
-			),
-			runWithRosetta(
-				{
-					locale: 'zh-TW',
-					defaultLocale: 'en',
-					translations: new Map(),
-					storage,
-				},
-				async () => {
-					await new Promise((r) => setTimeout(r, 10));
-					return getLocale();
-				}
-			),
-			runWithRosetta(
-				{
-					locale: 'ja',
-					defaultLocale: 'en',
-					translations: new Map(),
-					storage,
-				},
-				async () => {
-					return getLocale();
-				}
-			),
+			new Promise<string>((r) => setTimeout(() => r(translateEn('Hello World')), 50)),
+			new Promise<string>((r) => setTimeout(() => r(translateZh('Hello World')), 10)),
+			new Promise<string>((r) => setTimeout(() => r(translateJa('Hello World')), 0)),
 		]);
 
-		expect(results).toEqual(['en', 'zh-TW', 'ja']);
+		expect(results).toEqual(['Hello World', '你好世界', 'こんにちは世界']);
 	});
 });

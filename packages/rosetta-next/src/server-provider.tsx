@@ -1,13 +1,43 @@
 /**
- * Server-side RosettaProvider utilities
+ * Server-side RosettaProvider utilities (Edge-compatible)
  *
- * This file contains server-only code for AsyncLocalStorage context.
- * It does NOT import any client code to prevent bundling issues.
+ * This file provides helper functions for setting up translation context
+ * in Next.js app router layouts. Works in all JavaScript runtimes.
+ *
+ * With the new Edge-compatible architecture, the recommended pattern is:
+ *
+ * @example
+ * // app/[locale]/layout.tsx
+ * import { rosetta } from '@/lib/i18n'
+ * import { RosettaClientProvider } from '@sylphx/rosetta-next'
+ *
+ * export default async function Layout({ children, params }) {
+ *   const { locale } = await params
+ *   const clientData = await rosetta.getClientData(locale)
+ *
+ *   return (
+ *     <html lang={locale}>
+ *       <body>
+ *         <RosettaClientProvider {...clientData}>
+ *           {children}
+ *         </RosettaClientProvider>
+ *       </body>
+ *     </html>
+ *   )
+ * }
+ *
+ * @example Server component usage
+ * // app/[locale]/page.tsx
+ * import { rosetta } from '@/lib/i18n'
+ *
+ * export default async function Page({ params }) {
+ *   const { locale } = await params
+ *   const t = await rosetta.getTranslations(locale)
+ *   return <h1>{t("Welcome")}</h1>
+ * }
  */
 
-import { buildLocaleChain } from '@sylphx/rosetta';
 import type { ReactNode } from 'react';
-import { runWithRosetta } from './server/context';
 import type { Rosetta } from './server/rosetta';
 
 // Re-export locale utilities
@@ -61,74 +91,59 @@ export interface RosettaClientData {
 // ============================================
 
 /**
- * RosettaProvider - Server component that sets up AsyncLocalStorage context
+ * RosettaProvider - Lightweight server component wrapper
  *
- * Sets up server-side context for `getTranslations()` and `t()`.
- * Children should be wrapped with `RosettaClientProvider` for client components.
+ * With the new Edge-compatible architecture, this component is optional.
+ * The recommended pattern is to use `rosetta.getClientData(locale)` directly.
  *
- * @example
+ * @deprecated Use rosetta.getClientData(locale) + RosettaClientProvider instead.
+ * This component is kept for backward compatibility.
+ *
+ * @example Recommended pattern (without RosettaProvider)
+ * ```tsx
  * // app/[locale]/layout.tsx
- * import { RosettaProvider } from '@sylphx/rosetta-next/server'
- * import { RosettaClientProvider } from '@sylphx/rosetta-next'
  * import { rosetta } from '@/lib/i18n'
+ * import { RosettaClientProvider } from '@sylphx/rosetta-next'
  *
  * export default async function Layout({ children, params }) {
  *   const { locale } = await params
  *   const clientData = await rosetta.getClientData(locale)
  *
  *   return (
- *     <RosettaProvider rosetta={rosetta} locale={locale}>
- *       <RosettaClientProvider {...clientData}>
- *         <html lang={locale}>
- *           <body>{children}</body>
- *         </html>
- *       </RosettaClientProvider>
- *     </RosettaProvider>
+ *     <RosettaClientProvider {...clientData}>
+ *       {children}
+ *     </RosettaClientProvider>
  *   )
  * }
+ * ```
  *
- * @example Simpler pattern with spread
+ * @example Legacy pattern (with RosettaProvider)
+ * ```tsx
  * // app/[locale]/layout.tsx
- * import { RosettaProvider } from '@sylphx/rosetta-next/server'
+ * import { RosettaProvider, getClientData } from '@sylphx/rosetta-next/server'
  * import { RosettaClientProvider } from '@sylphx/rosetta-next'
  *
  * export default async function Layout({ children, params }) {
  *   const { locale } = await params
+ *   const clientData = await getClientData(rosetta, locale)
+ *
  *   return (
  *     <RosettaProvider rosetta={rosetta} locale={locale}>
- *       {async ({ clientData }) => (
- *         <RosettaClientProvider {...clientData}>
- *           {children}
- *         </RosettaClientProvider>
- *       )}
+ *       <RosettaClientProvider {...clientData}>
+ *         {children}
+ *       </RosettaClientProvider>
  *     </RosettaProvider>
  *   )
  * }
+ * ```
  */
 export async function RosettaProvider({
-	rosetta,
-	locale,
 	children,
-	hashes,
 }: RosettaProviderProps): Promise<React.ReactElement> {
-	// Load translations
-	const translations = hashes
-		? await rosetta.loadTranslationsByHashes(locale, hashes)
-		: await rosetta.loadTranslations(locale);
-	const defaultLocale = rosetta.getDefaultLocale();
-	const localeChain = buildLocaleChain(locale, defaultLocale);
-
-	// Run within AsyncLocalStorage context for server components
-	return runWithRosetta(
-		{
-			locale,
-			defaultLocale,
-			localeChain,
-			translations,
-			storage: rosetta.getStorage(),
-		},
-		() => <>{children}</>
-	);
+	// With the new architecture, RosettaProvider is just a passthrough.
+	// The actual context setup happens via rosetta.getTranslations(locale)
+	// which uses React's cache() for per-request memoization.
+	return <>{children}</>;
 }
 
 /**

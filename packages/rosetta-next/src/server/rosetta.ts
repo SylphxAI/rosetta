@@ -1,7 +1,8 @@
 /**
- * Rosetta server-side manager
+ * Rosetta server-side manager (Edge-compatible)
  *
  * Handles translation loading, caching, and generation.
+ * Works in all JavaScript runtimes: Node.js, Vercel Edge, Cloudflare Workers, Deno Deploy.
  */
 
 import {
@@ -20,7 +21,8 @@ import {
 	hashText,
 	isValidLocale,
 } from '@sylphx/rosetta';
-import { runWithRosetta } from './context';
+import { cache } from 'react';
+import { type TranslateFunction, createTranslator, translationsToRecord } from './context';
 
 /**
  * Locale detector function type
@@ -77,27 +79,78 @@ export interface RosettaConfig {
  *   defaultLocale: 'en',
  * })
  * ```
+ *
+ * @example Usage in server components
+ * ```tsx
+ * // app/[locale]/page.tsx
+ * import { rosetta } from '@/lib/i18n'
+ *
+ * export default async function Page({ params }) {
+ *   const { locale } = await params
+ *   const t = await rosetta.getTranslations(locale)
+ *   return <h1>{t("Welcome")}</h1>
+ * }
+ * ```
  */
 export function createRosetta(config: RosettaConfig): Rosetta {
 	return new Rosetta(config);
 }
 
 /**
- * Server-side Rosetta manager
+ * Server-side Rosetta manager (Edge-compatible)
  */
 export class Rosetta {
 	private storage: StorageAdapter;
 	private translator?: TranslateAdapter;
 	private defaultLocale: string;
 	private localeDetector?: LocaleDetector;
-	private cache?: CacheAdapter;
+	private cacheAdapter?: CacheAdapter;
+
+	// React cache() memoized getTranslations - created once per instance
+	private _getTranslations: (locale: string) => Promise<TranslateFunction>;
 
 	constructor(config: RosettaConfig) {
 		this.storage = config.storage;
 		this.translator = config.translator;
 		this.defaultLocale = config.defaultLocale ?? DEFAULT_LOCALE;
 		this.localeDetector = config.localeDetector;
-		this.cache = config.cache;
+		this.cacheAdapter = config.cache;
+
+		// Create cached getTranslations function
+		// React's cache() memoizes per-request, so multiple calls with same locale
+		// in the same render will reuse the same translations
+		this._getTranslations = cache(async (locale: string): Promise<TranslateFunction> => {
+			const translations = await this.loadTranslations(locale);
+			return createTranslator({
+				locale,
+				defaultLocale: this.defaultLocale,
+				translations,
+			});
+		});
+	}
+
+	/**
+	 * Get a translation function for the given locale (cached per-request)
+	 *
+	 * This is the primary API for server components. Uses React's cache()
+	 * to deduplicate translation loading within a single request.
+	 *
+	 * @example
+	 * export default async function Page({ params }) {
+	 *   const { locale } = await params
+	 *   const t = await rosetta.getTranslations(locale)
+	 *   return <h1>{t("Welcome")}</h1>
+	 * }
+	 *
+	 * @example With interpolation
+	 * const t = await rosetta.getTranslations(locale)
+	 * t("Hello {name}", { name: "John" }) // "Hello John"
+	 *
+	 * @example With context
+	 * t("Save", { context: "button" }) // Different hash for disambiguation
+	 */
+	getTranslations(locale: string): Promise<TranslateFunction> {
+		return this._getTranslations(locale);
 	}
 
 	/**
@@ -156,8 +209,8 @@ export class Rosetta {
 	 */
 	async loadTranslations(locale: string): Promise<Map<string, string>> {
 		// Check cache first
-		if (this.cache) {
-			const cached = await this.cache.get(locale);
+		if (this.cacheAdapter) {
+			const cached = await this.cacheAdapter.get(locale);
 			if (cached) return cached;
 		}
 
@@ -175,8 +228,8 @@ export class Rosetta {
 		}
 
 		// Cache result
-		if (this.cache && merged.size > 0) {
-			await this.cache.set(locale, merged);
+		if (this.cacheAdapter && merged.size > 0) {
+			await this.cacheAdapter.set(locale, merged);
 		}
 
 		return merged;
@@ -186,8 +239,8 @@ export class Rosetta {
 	 * Invalidate cached translations
 	 */
 	async invalidateCache(locale?: string): Promise<void> {
-		if (this.cache) {
-			await this.cache.invalidate(locale);
+		if (this.cacheAdapter) {
+			await this.cacheAdapter.invalidate(locale);
 		}
 	}
 
@@ -213,41 +266,48 @@ export class Rosetta {
 	}
 
 	/**
-	 * Initialize Rosetta context for the current request
+	 * Get Rosetta data for client hydration
+	 *
+	 * @example
+	 * const clientData = await rosetta.getClientData(locale)
+	 * return <RosettaClientProvider {...clientData}>{children}</RosettaClientProvider>
 	 */
-	async init<T>(fn: () => T | Promise<T>): Promise<T> {
-		const locale = await this.detectLocale();
+	async getClientData(locale: string): Promise<{
+		locale: string;
+		defaultLocale: string;
+		translations: Record<string, string>;
+	}> {
 		const translations = await this.loadTranslations(locale);
 
-		return runWithRosetta(
-			{
-				locale,
-				defaultLocale: this.defaultLocale,
-				translations,
-				storage: this.storage,
-			},
-			() => fn()
-		);
+		return {
+			locale,
+			defaultLocale: this.defaultLocale,
+			translations: translationsToRecord(translations),
+		};
 	}
 
 	/**
-	 * Get Rosetta data for client hydration
+	 * Get Rosetta data for client hydration with available locales
+	 *
+	 * @example
+	 * const clientData = await rosetta.getClientDataWithLocales(locale)
 	 */
-	async getClientData(): Promise<{
+	async getClientDataWithLocales(locale: string): Promise<{
 		locale: string;
 		defaultLocale: string;
 		availableLocales: string[];
 		translations: Record<string, string>;
 	}> {
-		const locale = await this.detectLocale();
-		const translations = await this.loadTranslations(locale);
-		const availableLocales = await this.getAvailableLocales();
+		const [translations, availableLocales] = await Promise.all([
+			this.loadTranslations(locale),
+			this.getAvailableLocales(),
+		]);
 
 		return {
 			locale,
 			defaultLocale: this.defaultLocale,
 			availableLocales,
-			translations: Object.fromEntries(translations),
+			translations: translationsToRecord(translations),
 		};
 	}
 
