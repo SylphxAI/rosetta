@@ -26,14 +26,12 @@
  */
 
 // ============================================
-// Constants
+// Constants (re-export from shared)
 // ============================================
 
-/** Default cookie name for locale preference */
-export const LOCALE_COOKIE_NAME: string = 'NEXT_LOCALE';
-
-/** Default cookie max age (1 year in seconds) */
-export const LOCALE_COOKIE_MAX_AGE: number = 60 * 60 * 24 * 365;
+// Import for local use and re-export (single source of truth)
+import { LOCALE_COOKIE_NAME, LOCALE_COOKIE_MAX_AGE } from './locale-constants';
+export { LOCALE_COOKIE_NAME, LOCALE_COOKIE_MAX_AGE };
 
 // ============================================
 // Types

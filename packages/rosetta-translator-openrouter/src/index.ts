@@ -175,7 +175,14 @@ export function createOpenRouterTranslator(config: OpenRouterTranslatorConfig): 
 						? firstContent.text
 						: '';
 
-			const parsed = JSON.parse(text) as TranslationResponse;
+			let parsed: TranslationResponse;
+			try {
+				parsed = JSON.parse(text) as TranslationResponse;
+			} catch (parseError) {
+				throw new Error(
+					`Failed to parse OpenRouter response as JSON: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`
+				);
+			}
 
 			if (parsed.translations && Array.isArray(parsed.translations)) {
 				results.push(...parsed.translations);

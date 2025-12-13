@@ -606,12 +606,18 @@ export class DrizzleStorageAdapter<
 
 	/**
 	 * Delete a source string and all its translations
+	 *
+	 * Note: This operation is not atomic. In rare cases of failure between
+	 * the two deletes, orphaned translations may remain. Consider using
+	 * database-level ON DELETE CASCADE or wrapping in a transaction if
+	 * this is critical for your use case.
 	 */
 	async deleteSource(hash: string): Promise<void> {
-		// Delete all translations for this hash
+		// Delete translations first (orphaned translations are less problematic
+		// than a source with missing translations)
 		await this.db.delete(this.translations).where(eq(this.translations.hash, hash));
 
-		// Delete source
+		// Then delete source
 		await this.db.delete(this.sources).where(eq(this.sources.hash, hash));
 	}
 }

@@ -28,30 +28,46 @@ import { cache } from 'react';
  * Request-scoped locale store using React cache()
  * This replaces AsyncLocalStorage for Edge compatibility
  *
- * Note: React's cache() only works during RSC rendering.
- * We use a fallback for non-React contexts (tests, scripts).
+ * How it works:
+ * - React's cache() memoizes per-request during RSC rendering
+ * - Each request gets its own isolated store object
+ * - Multiple calls to getRequestLocaleStore() in the same request return the same object
+ *
+ * For testing:
+ * - Outside RSC, cache() doesn't memoize (each call returns new object)
+ * - Use _setTestLocale() to set a test-only fallback
  */
 interface RequestLocaleStore {
 	locale: string | null;
 }
 
-// Fallback store for non-React contexts (tests, scripts)
-let fallbackStore: RequestLocaleStore = { locale: null };
+// Test-only fallback (NOT used in production RSC rendering)
+let testLocale: string | null = null;
+let isTestMode = false;
 
-// React cache() for RSC context - memoizes per request
+// React cache() for RSC context - creates isolated store per request
 const getRequestLocaleStore = cache((): RequestLocaleStore => {
-	// Return the fallback store to share state
-	// In RSC, this function is memoized per-request
-	// Outside RSC (tests), cache() doesn't memoize, but we still use fallbackStore
-	return fallbackStore;
+	// In RSC: This returns the same object for all calls within one request
+	// Each new request gets a fresh object with locale: null
+	return { locale: null };
 });
+
+/**
+ * Enable test mode with a specific locale
+ * @internal - Only for testing
+ */
+export function _setTestLocale(locale: string | null): void {
+	isTestMode = true;
+	testLocale = locale;
+}
 
 /**
  * Reset the locale store (for testing)
  * @internal
  */
 export function _resetLocaleStore(): void {
-	fallbackStore = { locale: null };
+	isTestMode = false;
+	testLocale = null;
 }
 
 /**
@@ -79,7 +95,12 @@ export function _resetLocaleStore(): void {
  * }
  */
 export function setRequestLocale(locale: string): void {
-	fallbackStore.locale = locale;
+	if (isTestMode) {
+		testLocale = locale;
+		return;
+	}
+	// In RSC: cache() ensures this is the same object for the entire request
+	getRequestLocaleStore().locale = locale;
 }
 
 /**
@@ -87,7 +108,11 @@ export function setRequestLocale(locale: string): void {
  * Returns null if setRequestLocale() was not called
  */
 export function getRequestLocale(): string | null {
-	return fallbackStore.locale;
+	if (isTestMode) {
+		return testLocale;
+	}
+	// In RSC: cache() ensures this returns the same object set by setRequestLocale
+	return getRequestLocaleStore().locale;
 }
 
 // ============================================
@@ -124,6 +149,12 @@ const serverPluralRulesCache: PluralRulesCache = createPluralRulesCache({ maxSiz
 
 /**
  * Parse t() options to extract context and params
+ *
+ * Distinguishes between:
+ * - TranslateOptions: { context?: string, params?: Record<string, string|number> }
+ * - Direct params: Record<string, string|number> for interpolation
+ *
+ * Key insight: if 'params' is present and is an object, it's TranslateOptions
  */
 function parseTranslateOptions(
 	paramsOrOptions?: Record<string, string | number> | TranslateOptions
@@ -132,17 +163,26 @@ function parseTranslateOptions(
 		return {};
 	}
 
-	// Check if it's TranslateOptions (has context or params keys only)
-	const keys = Object.keys(paramsOrOptions);
-	const isTranslateOptions =
-		keys.length > 0 && keys.every((k) => k === 'context' || k === 'params');
-
-	if (isTranslateOptions) {
+	// If 'params' is present and is an object, this is definitely TranslateOptions
+	if (
+		'params' in paramsOrOptions &&
+		typeof paramsOrOptions.params === 'object' &&
+		paramsOrOptions.params !== null
+	) {
 		const opts = paramsOrOptions as TranslateOptions;
 		return { context: opts.context, params: opts.params };
 	}
 
-	// Otherwise treat as direct params
+	// If only 'context' is present (and it's a string), this is TranslateOptions with just context
+	if (
+		'context' in paramsOrOptions &&
+		typeof paramsOrOptions.context === 'string' &&
+		Object.keys(paramsOrOptions).length === 1
+	) {
+		return { context: paramsOrOptions.context as string };
+	}
+
+	// Otherwise treat as direct interpolation params
 	return { params: paramsOrOptions as Record<string, string | number> };
 }
 
@@ -273,7 +313,7 @@ export function translationsToRecord(translations: Map<string, string>): Record<
  */
 export function getLocale(): string {
 	const locale = getRequestLocale();
-	if (!locale && process.env.NODE_ENV === 'development') {
+	if (!locale && typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
 		console.warn(
 			'[rosetta] getLocale() called without setRequestLocale(). ' +
 				'Call setRequestLocale(locale) in your layout first.'
@@ -282,30 +322,3 @@ export function getLocale(): string {
 	return locale ?? DEFAULT_LOCALE;
 }
 
-/**
- * @deprecated Pass defaultLocale explicitly or access from rosetta instance
- */
-export function getDefaultLocale(): string {
-	console.warn(
-		'[rosetta] getDefaultLocale() is deprecated. Use rosetta.getDefaultLocale() instead.'
-	);
-	return DEFAULT_LOCALE;
-}
-
-/**
- * @deprecated Use buildLocaleChain from @sylphx/rosetta
- */
-export function getLocaleChain(): string[] {
-	console.warn('[rosetta] getLocaleChain() is deprecated. Use buildLocaleChain() instead.');
-	return [getLocale()];
-}
-
-/**
- * @deprecated Use rosetta.getTranslations(locale) instead
- */
-export async function getTranslationsAsync(): Promise<TranslateFunction> {
-	console.warn(
-		'[rosetta] getTranslationsAsync() is deprecated. Use rosetta.getTranslations() instead.'
-	);
-	return (text: string) => text;
-}

@@ -1,6 +1,8 @@
 /**
  * @sylphx/rosetta-next/server - Server-side Rosetta integration for Next.js
  *
+ * Edge-compatible: Works in Node.js, Vercel Edge, Cloudflare Workers, Deno Deploy.
+ *
  * @example Setup
  * ```ts
  * // lib/i18n.ts
@@ -16,27 +18,33 @@
  * @example Layout
  * ```tsx
  * // app/[locale]/layout.tsx
- * import { RosettaProvider } from '@sylphx/rosetta-next/server'
- * import { rosetta } from '@/lib/i18n'
+ * import { rosetta, setRequestLocale } from '@/lib/i18n'
+ * import { RosettaClientProvider } from '@sylphx/rosetta-next'
  *
  * export default async function Layout({ children, params }) {
  *   const { locale } = await params
+ *   setRequestLocale(locale)
+ *   const clientData = await rosetta.getClientData(locale)
+ *
  *   return (
- *     <RosettaProvider rosetta={rosetta} locale={locale}>
- *       <html lang={locale}>
- *         <body>{children}</body>
- *       </html>
- *     </RosettaProvider>
+ *     <html lang={locale}>
+ *       <body>
+ *         <RosettaClientProvider {...clientData}>
+ *           {children}
+ *         </RosettaClientProvider>
+ *       </body>
+ *     </html>
  *   )
  * }
  * ```
  *
  * @example Server Component
  * ```tsx
- * import { getTranslations } from '@sylphx/rosetta-next/server'
+ * // app/[locale]/page.tsx
+ * import { rosetta } from '@/lib/i18n'
  *
  * export default async function Page() {
- *   const t = await getTranslations()
+ *   const t = await rosetta.getTranslations()  // Uses locale from setRequestLocale
  *   return <h1>{t("Welcome")}</h1>
  * }
  * ```
@@ -46,26 +54,23 @@
 export { createRosetta, Rosetta } from './rosetta';
 export type { RosettaConfig, LocaleDetector } from './rosetta';
 
-// Server context and translation function
+// Server context and translation utilities
 export {
 	t,
-	getTranslationsAsync as getTranslations,
+	createTranslator,
+	createCachedTranslations,
+	translationsToRecord,
+	setRequestLocale,
+	getRequestLocale,
 	getLocale,
-	getDefaultLocale,
-	getLocaleChain,
-	getTranslationsForClient,
-	runWithRosetta,
-	getRosettaContext,
-	isInsideRosettaContext,
-	rosettaStorage,
 } from './context';
-export type { RunWithRosettaOptions } from './context';
+export type { TranslateFunction, TranslatorContext } from './context';
 
 // Cache adapters
 export { InMemoryCache, ExternalCache, RequestScopedCache } from './cache';
 export type { InMemoryCacheOptions, ExternalCacheOptions, RedisLikeClient } from './cache';
 
-// Re-export locale utilities from locale.ts
+// Locale utilities
 export {
 	getReadyLocales,
 	buildLocaleCookie,
@@ -78,5 +83,3 @@ export {
 	type GetReadyLocalesOptions,
 	type LocaleCookieOptions,
 } from '../locale';
-
-// Provider will be exported separately to avoid circular dependency

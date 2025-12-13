@@ -18,11 +18,12 @@
  * @example Layout
  * ```tsx
  * // app/[locale]/layout.tsx
- * import { rosetta } from '@/lib/i18n'
+ * import { rosetta, setRequestLocale } from '@/lib/i18n'
  * import { RosettaClientProvider } from '@sylphx/rosetta-next'
  *
  * export default async function Layout({ children, params }) {
  *   const { locale } = await params
+ *   setRequestLocale(locale)
  *   const clientData = await rosetta.getClientData(locale)
  *
  *   return (
@@ -42,22 +43,12 @@
  * // app/[locale]/page.tsx
  * import { rosetta } from '@/lib/i18n'
  *
- * export default async function Page({ params }) {
- *   const { locale } = await params
- *   const t = await rosetta.getTranslations(locale)
+ * export default async function Page() {
+ *   const t = await rosetta.getTranslations()  // Uses locale from setRequestLocale
  *   return <h1>{t("Welcome")}</h1>
  * }
  * ```
  */
-
-// Server Provider and helpers (legacy, for backward compatibility)
-export {
-	RosettaProvider,
-	getClientData,
-	type RosettaProviderProps,
-	type RosettaManifest,
-	type RosettaClientData,
-} from './server-provider';
 
 // Rosetta instance factory
 export { createRosetta, Rosetta } from './server/rosetta';
@@ -73,15 +64,8 @@ export {
 	type TranslatorContext,
 } from './server/context';
 
-// Request-scoped locale (Edge-compatible alternative to AsyncLocalStorage)
+// Request-scoped locale (Edge-compatible)
 export { setRequestLocale, getRequestLocale, getLocale } from './server/context';
-
-// Legacy API (deprecated, for migration)
-export {
-	getDefaultLocale,
-	getLocaleChain,
-	getTranslationsAsync as getTranslations,
-} from './server/context';
 
 // Cache adapters
 export { InMemoryCache, ExternalCache, RequestScopedCache } from './server/cache';

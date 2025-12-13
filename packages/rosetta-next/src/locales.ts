@@ -75,7 +75,7 @@ export const ALL_LOCALES: readonly LocaleInfo[] = [
 		nativeName: 'العربية (السعودية)',
 		region: 'Saudi Arabia',
 	},
-	{ code: 'hy', name: 'Armenian', nativeName: 'Հdelays' },
+	{ code: 'hy', name: 'Armenian', nativeName: 'Հայերեն' },
 	{ code: 'az', name: 'Azerbaijani', nativeName: 'Azərbaycan' },
 	{ code: 'eu', name: 'Basque', nativeName: 'Euskara' },
 	{ code: 'be', name: 'Belarusian', nativeName: 'Беларуская' },

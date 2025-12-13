@@ -110,10 +110,14 @@ export function RosettaClientProvider({
 		return (text, paramsOrOptions) => {
 			try {
 				// Determine if paramsOrOptions is TranslateOptions or direct interpolation params
+				// TranslateOptions has: context (string for disambiguation) and/or params (object for interpolation)
+				// Direct params has: any keys with string/number values
+				// Key insight: if 'params' is present and is an object, it's TranslateOptions
 				const isTranslateOptions =
 					paramsOrOptions &&
-					('context' in paramsOrOptions || 'params' in paramsOrOptions) &&
-					Object.keys(paramsOrOptions).every((k) => k === 'context' || k === 'params');
+					('params' in paramsOrOptions &&
+						typeof paramsOrOptions.params === 'object' &&
+						paramsOrOptions.params !== null);
 
 				let context: string | undefined;
 				let params: Record<string, string | number> | undefined;
@@ -122,6 +126,14 @@ export function RosettaClientProvider({
 					const opts = paramsOrOptions as TranslateOptions;
 					context = opts.context;
 					params = opts.params;
+				} else if (
+					paramsOrOptions &&
+					'context' in paramsOrOptions &&
+					typeof paramsOrOptions.context === 'string' &&
+					Object.keys(paramsOrOptions).length === 1
+				) {
+					// Only context, no params - this is TranslateOptions with just context
+					context = paramsOrOptions.context as string;
 				} else {
 					params = paramsOrOptions as Record<string, string | number> | undefined;
 				}

@@ -7,12 +7,10 @@
 import { beforeEach, describe, expect, test } from 'bun:test';
 import {
 	_resetLocaleStore,
+	_setTestLocale,
 	createTranslator,
-	getDefaultLocale,
 	getLocale,
-	getLocaleChain,
 	getRequestLocale,
-	getTranslationsAsync,
 	setRequestLocale,
 	t,
 	translationsToRecord,
@@ -20,6 +18,7 @@ import {
 } from '../server/context';
 
 // Reset locale store before each test to ensure isolation
+// Tests run outside RSC context, so we use test mode
 beforeEach(() => {
 	_resetLocaleStore();
 });
@@ -181,74 +180,30 @@ describe('translationsToRecord', () => {
 
 describe('setRequestLocale / getRequestLocale', () => {
 	test('getRequestLocale returns null before setRequestLocale is called', () => {
-		// After beforeEach reset, should be null
+		// After beforeEach reset (not in test mode), should be null
+		// But outside RSC, cache() doesn't memoize, so we need test mode
+		_setTestLocale(null);
 		expect(getRequestLocale()).toBe(null);
 	});
 
-	test('setRequestLocale sets the locale', () => {
+	test('setRequestLocale sets the locale in test mode', () => {
+		_setTestLocale(null); // Enable test mode
 		setRequestLocale('zh-TW');
 		expect(getRequestLocale()).toBe('zh-TW');
 	});
 
 	test('getLocale returns the set locale', () => {
-		setRequestLocale('ja');
+		_setTestLocale('ja');
 		expect(getLocale()).toBe('ja');
 	});
 
 	test('getLocale returns default when not set', () => {
+		// Enable test mode with null locale
+		_setTestLocale(null);
 		// Suppress dev warning
 		const originalWarn = console.warn;
 		console.warn = () => {};
 		expect(getLocale()).toBe('en'); // DEFAULT_LOCALE
-		console.warn = originalWarn;
-	});
-});
-
-// ============================================
-// Legacy API Tests (deprecated)
-// ============================================
-
-describe('legacy API (deprecated)', () => {
-	test('getDefaultLocale returns default locale with warning', () => {
-		const originalWarn = console.warn;
-		let warnCalled = false;
-		console.warn = () => {
-			warnCalled = true;
-		};
-
-		expect(getDefaultLocale()).toBe('en');
-		expect(warnCalled).toBe(true);
-
-		console.warn = originalWarn;
-	});
-
-	test('getLocaleChain returns chain with warning', () => {
-		const originalWarn = console.warn;
-		let warnCalled = false;
-		console.warn = () => {
-			warnCalled = true;
-		};
-
-		// Will use the locale set by previous test or default
-		const chain = getLocaleChain();
-		expect(Array.isArray(chain)).toBe(true);
-		expect(warnCalled).toBe(true);
-
-		console.warn = originalWarn;
-	});
-
-	test('getTranslationsAsync returns passthrough function with warning', async () => {
-		const originalWarn = console.warn;
-		let warnCalled = false;
-		console.warn = () => {
-			warnCalled = true;
-		};
-
-		const translate = await getTranslationsAsync();
-		expect(typeof translate).toBe('function');
-		expect(translate('Test')).toBe('Test');
-		expect(warnCalled).toBe(true);
-
 		console.warn = originalWarn;
 	});
 });

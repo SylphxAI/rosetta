@@ -188,7 +188,7 @@ export class Rosetta {
 			const locale = await this.localeDetector();
 			if (locale && locale !== this.defaultLocale) {
 				if (!isValidLocale(locale)) {
-					if (process.env.NODE_ENV === 'development') {
+					if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
 						console.warn(
 							`[rosetta] Invalid locale format: "${locale}". Expected BCP 47 format. Falling back to default.`
 						);

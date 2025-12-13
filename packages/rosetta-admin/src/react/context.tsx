@@ -11,6 +11,7 @@ import {
 	useContext,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 } from 'react';
 import { type AdminStore, createAdminStore } from '../core/store';
@@ -60,20 +61,29 @@ export function useAdminStore(): AdminStore {
 
 /**
  * Hook to subscribe to store state changes
+ *
+ * Uses a ref for the selector to avoid infinite re-renders when
+ * inline selector functions are passed.
  */
 export function useAdminState<T>(selector: (store: AdminStore) => T): T {
 	const store = useAdminStore();
+	const selectorRef = useRef(selector);
 	const [value, setValue] = useState(() => selector(store));
+
+	// Keep selector ref up to date
+	selectorRef.current = selector;
 
 	useEffect(() => {
 		// Update immediately in case state changed
-		setValue(selector(store));
+		const newValue = selectorRef.current(store);
+		setValue(newValue);
 
 		// Subscribe to future changes
 		return store.subscribe(() => {
-			setValue(selector(store));
+			const nextValue = selectorRef.current(store);
+			setValue(nextValue);
 		});
-	}, [store, selector]);
+	}, [store]); // selector intentionally omitted - using ref instead
 
 	return value;
 }

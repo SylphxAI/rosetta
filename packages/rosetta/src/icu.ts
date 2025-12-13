@@ -22,7 +22,15 @@ import { interpolate } from './interpolate';
 /** Maximum ICU nesting depth (prevents DoS via deeply nested patterns) */
 export const MAX_ICU_NESTING_DEPTH = 5;
 
-/** Maximum text length in characters */
+/**
+ * Maximum text length for ICU formatting (50KB)
+ *
+ * Note: This is intentionally larger than validation.ts MAX_TEXT_LENGTH (10KB).
+ * - Validation limit (10KB): Strict limit for user input
+ * - ICU limit (50KB): More lenient for formatting cached/combined texts
+ *
+ * Exported as MAX_ICU_TEXT_LENGTH from index.ts to avoid confusion.
+ */
 export const MAX_TEXT_LENGTH = 50_000;
 
 /** Maximum iterations for ICU parsing loop */
@@ -231,7 +239,7 @@ function formatICU(
 		const optionsStart = matchStart + patternMatch[0].length;
 
 		// Find matching closing brace
-		const matchEnd = findClosingBrace(result, optionsStart, depth);
+		const matchEnd = findClosingBrace(result, optionsStart);
 		if (matchEnd === -1) {
 			startIndex = matchStart + 1;
 			continue;
@@ -280,7 +288,7 @@ function formatICU(
  *
  * @internal
  */
-function findClosingBrace(text: string, start: number, _depth: number): number {
+function findClosingBrace(text: string, start: number): number {
 	let braceCount = 1;
 	let braceDepth = 1;
 	let i = start;

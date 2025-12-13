@@ -30,31 +30,8 @@
 // Cache Interface
 // ============================================
 
-/**
- * Cache adapter interface for translation caching
- */
-export interface CacheAdapter {
-	/**
-	 * Get cached translations for a locale
-	 * @returns Map of hash -> text, or null if not cached
-	 */
-	get(locale: string): Promise<Map<string, string> | null>;
-
-	/**
-	 * Set translations for a locale
-	 */
-	set(locale: string, translations: Map<string, string>): Promise<void>;
-
-	/**
-	 * Invalidate cache for a locale (or all if locale not specified)
-	 */
-	invalidate(locale?: string): Promise<void>;
-
-	/**
-	 * Check if cache has entry for locale
-	 */
-	has(locale: string): Promise<boolean>;
-}
+// Re-export CacheAdapter from types.ts (single source of truth)
+export type { CacheAdapter } from './types';
 
 // ============================================
 // In-Memory Cache (Traditional Server)

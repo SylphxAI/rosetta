@@ -50,6 +50,7 @@
  */
 
 import type { Rosetta } from './server/rosetta';
+import { LOCALE_COOKIE_NAME, LOCALE_COOKIE_MAX_AGE } from './locale-constants';
 
 // ============================================
 // Types
@@ -218,11 +219,8 @@ export async function getReadyLocales(
 // Cookie Utilities
 // ============================================
 
-/** Default cookie name for locale preference */
-export const LOCALE_COOKIE_NAME: string = 'NEXT_LOCALE';
-
-/** Default cookie max age (1 year in seconds) */
-export const LOCALE_COOKIE_MAX_AGE: number = 60 * 60 * 24 * 365;
+// Re-export from shared constants (single source of truth)
+export { LOCALE_COOKIE_NAME, LOCALE_COOKIE_MAX_AGE } from './locale-constants';
 
 /**
  * Options for locale cookie
@@ -267,7 +265,7 @@ export function buildLocaleCookie(locale: string, options: LocaleCookieOptions =
 		maxAge = LOCALE_COOKIE_MAX_AGE,
 		path = '/',
 		sameSite = 'lax',
-		secure = process.env.NODE_ENV === 'production',
+		secure = typeof process !== 'undefined' && process.env?.NODE_ENV === 'production',
 	} = options;
 
 	const parts = [
