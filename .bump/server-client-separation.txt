@@ -1,0 +1,1 @@
+minor: separate server and client code bundles to fix Turbopack and Edge runtime compatibility
