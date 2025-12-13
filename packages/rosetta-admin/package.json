@@ -26,7 +26,8 @@
 		"dist"
 	],
 	"scripts": {
-		"build": "bunup src/index.ts --format esm --dts --external react --external @sylphx/rosetta --splitting=false --target browser && bunup src/react/index.ts --format esm --dts --external react --external @sylphx/rosetta --no-clean --splitting=false --target browser --out-dir dist/react && bunup src/server/index.ts src/server/trpc.ts --format esm --dts --external react --external @sylphx/rosetta --external @trpc/server --external zod --no-clean --splitting=false --target node --out-dir dist/server",
+		"build": "NODE_ENV=production bunup src/index.ts --format esm --dts --external react --external @sylphx/rosetta --splitting=false --target browser && bunup src/react/index.ts --format esm --dts --external react --external @sylphx/rosetta --no-clean --splitting=false --target browser --jsx.runtime automatic --jsx.import-source react --out-dir dist/react && bunup src/server/index.ts src/server/trpc.ts --format esm --dts --external react --external @sylphx/rosetta --external @trpc/server --external zod --no-clean --splitting=false --target node --out-dir dist/server && bun run build:fix",
+		"build:fix": "find dist -name '*.js' -exec sed -i.bak 's/jsx-dev-runtime/jsx-runtime/g; s/jsxDEV/jsx/g' {} \\; && find dist -name '*.bak' -delete",
 		"dev": "bunup src/index.ts src/react/index.ts src/server/index.ts src/server/trpc.ts --format esm --dts --external react --external @sylphx/rosetta --watch",
 		"test": "bun test",
 		"typecheck": "tsc --noEmit",
